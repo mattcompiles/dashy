@@ -23,7 +23,7 @@ export async function getServerSideProps({ query }) {
     },
   );
 
-  console.log(code, body);
+  console.log(query, body);
 
   return {
     props: { githubToken: body.access_token },
