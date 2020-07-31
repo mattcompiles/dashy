@@ -8,7 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "got": "^11.5.1",
     "next": "^9.3.3",
+    "query-string": "^6.13.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"
   }
