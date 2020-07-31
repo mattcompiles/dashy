@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 export async function getServerSideProps({ query }) {
   const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+  s;
 
   const { code } = queryString.parse(query);
 
@@ -23,7 +24,7 @@ export async function getServerSideProps({ query }) {
     },
   );
 
-  console.log(body);
+  console.log(code, body);
 
   return {
     props: { githubToken: body.access_token },
