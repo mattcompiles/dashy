@@ -31,7 +31,7 @@ export async function getServerSideProps({ query }) {
 function AuthCallback({ githubToken }) {
   useEffect(() => {
     localStorage.setItem('githubToken', githubToken);
-  }, [accessToken]);
+  }, [githubToken]);
 
   return <div>Logged in!</div>;
 }
