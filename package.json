@@ -13,5 +13,9 @@
     "query-string": "^6.13.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.44",
+    "typescript": "^3.9.7"
   }
 }
