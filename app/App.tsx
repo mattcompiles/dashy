@@ -1,20 +1,18 @@
 import React from 'react';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { Set, Box } from 'bumbag';
 
 import { Repo } from './Repo';
 
-const client = new ApolloClient({
-  uri: 'https://api.github.com/graphql',
-  cache: new InMemoryCache(),
-  headers: {
-    authorization: `bearer ${localStorage.getItem('githubToken')}`,
-  },
-});
-
 export function App() {
+  const repos = JSON.parse(localStorage.getItem('repos') ?? '[]');
+
   return (
-    <ApolloProvider client={client}>
-      <Repo />
-    </ApolloProvider>
+    <Box alignX="center">
+      <Set alignY="top">
+        {repos.map(({ owner, name }: any) => (
+          <Repo key={`${owner}${name}`} owner={owner} name={name} />
+        ))}
+      </Set>
+    </Box>
   );
 }

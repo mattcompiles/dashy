@@ -1,26 +1,38 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useQuery, gql } from '@apollo/client';
+import {
+  Box,
+  Heading,
+  Card,
+  Columns,
+  Badge,
+  Stack,
+  Divider,
+  Text,
+} from 'bumbag';
+import { PullRequest } from './PullRequest';
 
 const GET_REPO = gql`
   query GetRepo($name: String!, $owner: String!) {
     repository(name: $name, owner: $owner) {
       name
       pullRequests(states: OPEN, first: 10) {
+        totalCount
         edges {
           node {
             title
             mergeable
             viewerDidAuthor
+            reviewDecision
+            url
             commits(first: 1) {
               nodes {
                 commit {
-                  status {
-                    contexts {
-                      state
-                      description
-                      targetUrl
-                    }
+                  statusCheckRollup {
                     state
+                    contexts(first: 10) {
+                      totalCount
+                    }
                   }
                 }
               }
@@ -32,6 +44,22 @@ const GET_REPO = gql`
   }
 `;
 
+const renderPRs = (pullRequests: any) =>
+  pullRequests.map(({ node }: any) => {
+    const { state, contexts } = node.commits.nodes[0].commit.statusCheckRollup;
+    return (
+      <PullRequest
+        key={node.title}
+        title={node.title}
+        status={state}
+        numChecks={contexts.totalCount}
+        uptoDate={node.mergeable}
+        reviewDecision={node.reviewDecision}
+        url={node.url}
+      />
+    );
+  });
+
 interface RepoProps {
   owner: string;
   name: string;
@@ -39,10 +67,51 @@ interface RepoProps {
 export function Repo({ owner, name }: RepoProps) {
   const { loading, error, data } = useQuery(GET_REPO, {
     variables: { owner, name },
+    pollInterval: 60000, // once a minute
   });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
-  return <pre>{JSON.stringify(data, null, 2)}</pre>;
+  const { repository } = data;
+
+  const viewerPRs = repository.pullRequests.edges.filter(
+    ({ node }: any) => node.viewerDidAuthor,
+  );
+
+  const otherPRs = repository.pullRequests.edges.filter(
+    ({ node }: any) => !node.viewerDidAuthor,
+  );
+
+  return (
+    <Box width="500px" alignY="top">
+      <Card>
+        <Stack spacing="major-1">
+          <Columns>
+            <Columns.Column spread={1}>
+              <Badge palette="success" />
+            </Columns.Column>
+            <Columns.Column>
+              <Heading use="h4">{name}</Heading>
+            </Columns.Column>
+          </Columns>
+          <Divider />
+          {repository.pullRequests.totalCount === 0 ? (
+            <Text>No open pull requests</Text>
+          ) : (
+            <Fragment>
+              {viewerPRs.length > 0 ? (
+                <Fragment>
+                  {renderPRs(viewerPRs)}
+                  <Divider />
+                </Fragment>
+              ) : null}
+
+              {renderPRs(otherPRs)}
+            </Fragment>
+          )}
+        </Stack>
+      </Card>
+    </Box>
+  );
 }
