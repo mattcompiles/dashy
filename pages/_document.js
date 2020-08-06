@@ -24,6 +24,11 @@ export default class MyDocument extends Document {
       <html>
         <Head />
         <body>
+          <style>{`
+          #__next-prerender-indicator {
+            display: none;
+          }
+          `}</style>
           <InitializeColorMode />
           <Main />
           <NextScript />

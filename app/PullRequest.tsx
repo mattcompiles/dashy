@@ -1,5 +1,6 @@
 import React from 'react';
-import { Columns, Tag, Button, Link } from 'bumbag';
+import { Columns, Tag, Button, Link, Stack, Set, Text } from 'bumbag';
+import { formatDistanceToNow } from 'date-fns';
 
 type Status = 'EXPECTED' | 'ERROR' | 'FAILURE' | 'PENDING' | 'SUCCESS';
 type ReviewDecision = 'CHANGES_REQUESTED' | 'APPROVED' | 'REVIEW_REQUIRED';
@@ -35,6 +36,8 @@ interface PullRequestProps {
   uptoDate: boolean;
   reviewDecision: ReviewDecision;
   url: string;
+  lastCodeUpdate: string;
+  lastActivity?: string;
 }
 export function PullRequest({
   title,
@@ -43,6 +46,8 @@ export function PullRequest({
   uptoDate,
   reviewDecision,
   url,
+  lastCodeUpdate,
+  lastActivity,
 }: PullRequestProps) {
   const mergeable =
     uptoDate && reviewDecision === 'APPROVED' && status === 'SUCCESS';
@@ -50,7 +55,25 @@ export function PullRequest({
   return (
     <Columns>
       <Columns.Column>
-        <Link href={url}>{title}</Link>
+        <Stack spacing="minor-1">
+          <Link href={url}>{title}</Link>
+          <Set>
+            <Text use="sup">
+              Code:{' '}
+              {formatDistanceToNow(new Date(lastCodeUpdate), {
+                addSuffix: true,
+              })}
+            </Text>
+            {lastActivity ? (
+              <Text use="sup">
+                Activity:{' '}
+                {formatDistanceToNow(new Date(lastActivity), {
+                  addSuffix: true,
+                })}
+              </Text>
+            ) : null}
+          </Set>
+        </Stack>
       </Columns.Column>
       {mergeable ? (
         <Columns.Column spread={2}>

@@ -1,6 +1,7 @@
 import NextApp from 'next/app';
 import { Provider as BumbagProvider } from 'bumbag';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { RecoilRoot } from 'recoil';
 
 const client = new ApolloClient({
   uri: 'https://api.github.com/graphql',
@@ -17,11 +18,13 @@ export default class App extends NextApp {
   render() {
     const { Component, pageProps } = this.props;
     return (
-      <ApolloProvider client={client}>
-        <BumbagProvider>
-          <Component {...pageProps} />
-        </BumbagProvider>
-      </ApolloProvider>
+      <RecoilRoot>
+        <ApolloProvider client={client}>
+          <BumbagProvider>
+            <Component {...pageProps} />
+          </BumbagProvider>
+        </ApolloProvider>
+      </RecoilRoot>
     );
   }
 }

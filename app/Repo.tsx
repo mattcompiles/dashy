@@ -10,6 +10,7 @@ import {
   Divider,
   Text,
 } from 'bumbag';
+
 import { PullRequest } from './PullRequest';
 
 const GET_REPO = gql`
@@ -28,11 +29,27 @@ const GET_REPO = gql`
             commits(first: 1) {
               nodes {
                 commit {
+                  pushedDate
                   statusCheckRollup {
                     state
                     contexts(first: 10) {
                       totalCount
                     }
+                  }
+                }
+              }
+            }
+            timelineItems(
+              itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW]
+              last: 1
+            ) {
+              edges {
+                node {
+                  ... on IssueComment {
+                    updatedAt
+                  }
+                  ... on PullRequestReview {
+                    updatedAt
                   }
                 }
               }
@@ -46,16 +63,23 @@ const GET_REPO = gql`
 
 const renderPRs = (pullRequests: any) =>
   pullRequests.map(({ node }: any) => {
-    const { state, contexts } = node.commits.nodes[0].commit.statusCheckRollup;
+    const { statusCheckRollup, pushedDate } = node.commits.nodes[0].commit;
+    const lastActivity =
+      node.timelineItems.edges.length > 0
+        ? node.timelineItems.edges[0].node.updatedAt
+        : undefined;
+
     return (
       <PullRequest
         key={node.title}
         title={node.title}
-        status={state}
-        numChecks={contexts.totalCount}
+        status={statusCheckRollup?.state ?? 'PENDING'}
+        numChecks={statusCheckRollup?.contexts.totalCount ?? -1}
         uptoDate={node.mergeable}
         reviewDecision={node.reviewDecision}
         url={node.url}
+        lastCodeUpdate={pushedDate}
+        lastActivity={lastActivity}
       />
     );
   });
