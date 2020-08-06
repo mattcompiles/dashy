@@ -26,7 +26,7 @@ const GET_REPO = gql`
             viewerDidAuthor
             reviewDecision
             url
-            commits(first: 1) {
+            commits(last: 1) {
               nodes {
                 commit {
                   pushedDate
