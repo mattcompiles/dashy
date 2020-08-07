@@ -27,7 +27,11 @@ const GET_REPO = gql`
           tagName
         }
       }
-      pullRequests(states: OPEN, first: 10) {
+      pullRequests(
+        states: OPEN
+        first: 10
+        orderBy: { field: UPDATED_AT, direction: DESC }
+      ) {
         totalCount
         edges {
           node {
