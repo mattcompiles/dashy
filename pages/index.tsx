@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { App } from '../app/App';
-
-const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+import { Login } from '../app/Login';
 
 const Home = () => {
   const [isAuthed, setAuthed] = useState(false);
@@ -15,17 +14,7 @@ const Home = () => {
     }
   }, []);
 
-  return isAuthed ? (
-    <App />
-  ) : (
-    <div>
-      <a
-        href={`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=repo`}
-      >
-        Login
-      </a>
-    </div>
-  );
+  return isAuthed ? <App /> : <Login />;
 };
 
 export default Home;

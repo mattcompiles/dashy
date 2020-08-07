@@ -12,3 +12,11 @@ export const reposState = atom<Array<Repo>>({
       ? JSON.parse(localStorage.getItem('repos') ?? '[]')
       : [],
 });
+
+export const tokenState = atom<string | undefined>({
+  key: 'token',
+  default:
+    typeof localStorage === 'object'
+      ? localStorage.getItem('githubToken') ?? undefined
+      : undefined,
+});

@@ -9,14 +9,24 @@ import {
   Stack,
   Divider,
   Text,
+  Link,
 } from 'bumbag';
+import { format } from 'date-fns';
 
 import { PullRequest } from './PullRequest';
 
 const GET_REPO = gql`
   query GetRepo($name: String!, $owner: String!) {
     repository(name: $name, owner: $owner) {
-      name
+      url
+      releases(last: 1) {
+        nodes {
+          publishedAt
+          description
+          url
+          tagName
+        }
+      }
       pullRequests(states: OPEN, first: 10) {
         totalCount
         edges {
@@ -107,6 +117,8 @@ export function Repo({ owner, name }: RepoProps) {
     ({ node }: any) => !node.viewerDidAuthor,
   );
 
+  const latestRelease = repository.releases.nodes[0];
+
   return (
     <Box width="500px" alignY="top">
       <Card>
@@ -116,9 +128,22 @@ export function Repo({ owner, name }: RepoProps) {
               <Badge palette="success" />
             </Columns.Column>
             <Columns.Column>
-              <Heading use="h4">{name}</Heading>
+              <Link href={repository.url}>
+                <Heading use="h4">{name}</Heading>
+              </Link>
+            </Columns.Column>
+            <Columns.Column spread={3}>
+              <Box>
+                <Link href={latestRelease.url}>{latestRelease.tagName}</Link>
+              </Box>
+              <Box>
+                <Text use="sub">
+                  {format(new Date(latestRelease.publishedAt), 'PP')}
+                </Text>
+              </Box>
             </Columns.Column>
           </Columns>
+
           <Divider />
           {repository.pullRequests.totalCount === 0 ? (
             <Text>No open pull requests</Text>
