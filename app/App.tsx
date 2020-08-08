@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { Columns, Box, Button, Modal, Stack } from 'bumbag';
 import { useRecoilValue } from 'recoil';
-import { InMemoryCache, ApolloClient, ApolloProvider } from '@apollo/client';
+import { RelayEnvironmentProvider } from 'relay-hooks';
 
 import { Repo } from './Repo';
 import { Settings } from './Settings';
 import { reposState, tokenState } from './state';
-
-const cache = new InMemoryCache();
+import { makeRelayEnvironment } from './relayEnvironment';
 
 function splitRepoColumns(repos: Array<any>) {
   const columnCount = Math.floor(document.body.scrollWidth / 400);
@@ -27,17 +26,7 @@ export function App() {
   const repos = useRecoilValue(reposState);
   const token = useRecoilValue(tokenState);
 
-  const client = useMemo(
-    () =>
-      new ApolloClient({
-        uri: 'https://api.github.com/graphql',
-        cache,
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      }),
-    [token],
-  );
+  const relayEnvironment = useMemo(() => makeRelayEnvironment(token), [token]);
 
   useEffect(() => {
     localStorage.setItem('repos', JSON.stringify(repos));
@@ -46,7 +35,7 @@ export function App() {
   const repoColumns = splitRepoColumns(repos);
 
   return (
-    <ApolloProvider client={client}>
+    <RelayEnvironmentProvider environment={relayEnvironment}>
       <Columns spacing="major-4">
         {repoColumns.map((repoColumn, index) => (
           <Columns.Column key={index}>
@@ -64,6 +53,6 @@ export function App() {
         </Box>
         <Settings />
       </Modal.State>
-    </ApolloProvider>
+    </RelayEnvironmentProvider>
   );
 }

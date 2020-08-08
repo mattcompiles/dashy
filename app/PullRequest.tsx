@@ -1,11 +1,50 @@
 import React from 'react';
 import { Columns, Tag, Button, Link, Stack, Set, Text } from 'bumbag';
 import { formatDistanceToNow } from 'date-fns';
+import { useFragment, graphql } from 'relay-hooks';
 
-type Status = 'EXPECTED' | 'ERROR' | 'FAILURE' | 'PENDING' | 'SUCCESS';
-type ReviewDecision = 'CHANGES_REQUESTED' | 'APPROVED' | 'REVIEW_REQUIRED';
+import {
+  PullRequest_pr$key,
+  StatusState,
+  PullRequestReviewDecision,
+} from './__generated__/PullRequest_pr.graphql';
 
-function reviewDecisionToPallete(reviewDecision: ReviewDecision) {
+const pullRequestFragment = graphql`
+  fragment PullRequest_pr on PullRequest {
+    title
+    mergeable
+    viewerDidAuthor
+    reviewDecision
+    url
+    commits(last: 1) {
+      nodes {
+        commit {
+          pushedDate
+          statusCheckRollup {
+            state
+            contexts(first: 10) {
+              totalCount
+            }
+          }
+        }
+      }
+    }
+    timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {
+      nodes {
+        ... on IssueComment {
+          updatedAt
+        }
+        ... on PullRequestReview {
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
+function reviewDecisionToPallete(
+  reviewDecision: PullRequestReviewDecision | null,
+) {
   if (reviewDecision === 'APPROVED') {
     return 'success';
   }
@@ -17,7 +56,7 @@ function reviewDecisionToPallete(reviewDecision: ReviewDecision) {
   return 'warning';
 }
 
-function statusToPallete(status: Status) {
+function statusToPallete(status: StatusState | undefined) {
   if (status === 'SUCCESS') {
     return 'success';
   }
@@ -30,27 +69,36 @@ function statusToPallete(status: Status) {
 }
 
 interface PullRequestProps {
-  title: string;
-  numChecks: number;
-  status: Status;
-  uptoDate: boolean;
-  reviewDecision: ReviewDecision;
-  url: string;
-  lastCodeUpdate: string;
-  lastActivity?: string;
+  pr: PullRequest_pr$key;
 }
-export function PullRequest({
-  title,
-  status,
-  numChecks,
-  uptoDate,
-  reviewDecision,
-  url,
-  lastCodeUpdate,
-  lastActivity,
-}: PullRequestProps) {
-  const mergeable =
-    uptoDate && reviewDecision === 'APPROVED' && status === 'SUCCESS';
+export function PullRequest({ pr }: PullRequestProps) {
+  const {
+    title,
+    url,
+    reviewDecision,
+    mergeable,
+    commits,
+    timelineItems,
+  } = useFragment(pullRequestFragment, pr);
+
+  const lastActivity = timelineItems.nodes
+    ? timelineItems.nodes[0]?.updatedAt
+    : null;
+
+  const lastCodeUpdate = commits.nodes
+    ? commits.nodes[0]?.commit.pushedDate
+    : null;
+
+  const status = commits.nodes
+    ? commits.nodes[0]?.commit.statusCheckRollup?.state
+    : undefined;
+
+  const numChecks = commits.nodes
+    ? commits.nodes[0]?.commit.statusCheckRollup?.contexts.totalCount
+    : null;
+
+  const canMerge =
+    mergeable && reviewDecision === 'APPROVED' && status === 'SUCCESS';
 
   return (
     <Columns>
@@ -58,12 +106,14 @@ export function PullRequest({
         <Stack spacing="minor-1">
           <Link href={url}>{title}</Link>
           <Set>
-            <Text use="sup">
-              Code:{' '}
-              {formatDistanceToNow(new Date(lastCodeUpdate), {
-                addSuffix: true,
-              })}
-            </Text>
+            {lastCodeUpdate ? (
+              <Text use="sup">
+                Code:{' '}
+                {formatDistanceToNow(new Date(lastCodeUpdate), {
+                  addSuffix: true,
+                })}
+              </Text>
+            ) : null}
             {lastActivity ? (
               <Text use="sup">
                 Activity:{' '}
@@ -75,12 +125,12 @@ export function PullRequest({
           </Set>
         </Stack>
       </Columns.Column>
-      {mergeable ? (
+      {canMerge ? (
         <Columns.Column spread={2}>
           <Button size="small">Merge</Button>
         </Columns.Column>
       ) : null}
-      {!uptoDate ? (
+      {!mergeable ? (
         <Columns.Column spread={2}>
           <Button size="small">Update</Button>
         </Columns.Column>
