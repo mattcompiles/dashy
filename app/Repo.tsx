@@ -124,47 +124,45 @@ export function Repo({ owner, name }: RepoProps) {
   const latestRelease = repository.releases.nodes[0];
 
   return (
-    <Box width="500px" alignY="top">
-      <Card>
-        <Stack spacing="major-1">
-          <Columns>
-            <Columns.Column spread={1}>
-              <Badge palette="success" />
-            </Columns.Column>
-            <Columns.Column>
-              <Link href={repository.url}>
-                <Heading use="h4">{name}</Heading>
-              </Link>
-            </Columns.Column>
-            <Columns.Column spread={3}>
-              <Box>
-                <Link href={latestRelease.url}>{latestRelease.tagName}</Link>
-              </Box>
-              <Box>
-                <Text use="sub">
-                  {format(new Date(latestRelease.publishedAt), 'PP')}
-                </Text>
-              </Box>
-            </Columns.Column>
-          </Columns>
+    <Card>
+      <Stack spacing="major-1">
+        <Columns>
+          <Columns.Column spread={1}>
+            <Badge palette="success" />
+          </Columns.Column>
+          <Columns.Column>
+            <Link href={repository.url}>
+              <Heading use="h4">{name}</Heading>
+            </Link>
+          </Columns.Column>
+          <Columns.Column spread={3}>
+            <Box>
+              <Link href={latestRelease.url}>{latestRelease.tagName}</Link>
+            </Box>
+            <Box>
+              <Text use="sub">
+                {format(new Date(latestRelease.publishedAt), 'PP')}
+              </Text>
+            </Box>
+          </Columns.Column>
+        </Columns>
 
-          <Divider />
-          {repository.pullRequests.totalCount === 0 ? (
-            <Text>No open pull requests</Text>
-          ) : (
-            <Fragment>
-              {viewerPRs.length > 0 ? (
-                <Fragment>
-                  {renderPRs(viewerPRs)}
-                  <Divider />
-                </Fragment>
-              ) : null}
+        <Divider />
+        {repository.pullRequests.totalCount === 0 ? (
+          <Text>No open pull requests</Text>
+        ) : (
+          <Fragment>
+            {viewerPRs.length > 0 ? (
+              <Fragment>
+                {renderPRs(viewerPRs)}
+                <Divider />
+              </Fragment>
+            ) : null}
 
-              {renderPRs(otherPRs)}
-            </Fragment>
-          )}
-        </Stack>
-      </Card>
-    </Box>
+            {renderPRs(otherPRs)}
+          </Fragment>
+        )}
+      </Stack>
+    </Card>
   );
 }
