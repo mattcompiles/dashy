@@ -1,15 +1,23 @@
 import { atom } from 'recoil';
 
 interface Repo {
+  type: 'repo';
   owner: string;
   name: string;
 }
 
-export const reposState = atom<Array<Repo>>({
-  key: 'repos',
+interface Issue {
+  type: 'issue';
+  repoOwner: string;
+  repoName: string;
+  issue: number;
+}
+
+export const tilesState = atom<Array<Repo | Issue>>({
+  key: 'tiles',
   default:
     typeof localStorage === 'object'
-      ? JSON.parse(localStorage.getItem('repos') ?? '[]')
+      ? JSON.parse(localStorage.getItem('tiles') ?? '[]')
       : [],
 });
 

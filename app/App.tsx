@@ -12,36 +12,37 @@ import { useRecoilValue } from 'recoil';
 import { RelayEnvironmentProvider } from 'relay-hooks';
 
 import { Repo } from './Repo';
+import { Issue } from './Issue';
 import { Settings } from './Settings';
-import { reposState, tokenState } from './state';
+import { tokenState, tilesState } from './state';
 import { makeRelayEnvironment } from './relayEnvironment';
 import { Refresh } from './Refresh';
 
-function splitRepoColumns(repos: Array<any>) {
+function splitTileColumns<T>(tiles: Array<T>): Array<Array<T>> {
   const columnCount = Math.floor(document.body.scrollWidth / 400);
 
   return Array.from({ length: columnCount }).map((_, columnIndex) => {
-    return repos.filter((_, repoIndex) => {
+    return tiles.filter((_, tileIndex) => {
       if (columnCount === 0) {
-        return repoIndex === columnIndex;
+        return tileIndex === columnIndex;
       }
 
-      return repoIndex % columnCount === columnIndex;
+      return tileIndex % columnCount === columnIndex;
     });
   });
 }
 
 export function App() {
-  const repos = useRecoilValue(reposState);
+  const tiles = useRecoilValue(tilesState);
   const token = useRecoilValue(tokenState);
 
   const relayEnvironment = useMemo(() => makeRelayEnvironment(token), [token]);
 
   useEffect(() => {
-    localStorage.setItem('repos', JSON.stringify(repos));
-  }, [repos]);
+    localStorage.setItem('tiles', JSON.stringify(tiles));
+  }, [tiles]);
 
-  const repoColumns = splitRepoColumns(repos);
+  const tileColumns = splitTileColumns(tiles);
 
   const header = (
     <TopNav>
@@ -61,12 +62,25 @@ export function App() {
       <PageWithHeader header={header}>
         <Box padding="major-3">
           <Columns spacing="major-3">
-            {repoColumns.map((repoColumn, index) => (
+            {tileColumns.map((tileColumn, index) => (
               <Columns.Column key={index}>
                 <Stack>
-                  {repoColumn.map(({ owner, name }: any) => (
-                    <Repo key={`${owner}${name}`} owner={owner} name={name} />
-                  ))}
+                  {tileColumn.map((props) =>
+                    props.type === 'repo' ? (
+                      <Repo
+                        key={`${props.owner}${props.name}`}
+                        owner={props.owner}
+                        name={props.name}
+                      />
+                    ) : (
+                      <Issue
+                        key={`${props.repoOwner}${props.repoName}${props.issue}`}
+                        repoOwner={props.repoOwner}
+                        repoName={props.repoName}
+                        issue={props.issue}
+                      />
+                    ),
+                  )}
                 </Stack>
               </Columns.Column>
             ))}
