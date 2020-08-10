@@ -10,17 +10,22 @@ import {
   Divider,
   Text,
   Link,
+  Icon,
+  Level,
+  Set,
 } from 'bumbag';
 import { format } from 'date-fns';
 
 import { PullRequest } from './PullRequest';
 import { RepoQuery } from './__generated__/RepoQuery.graphql';
-import { PullRequest_pr$key } from './__generated__/PullRequest_pr.graphql';
+
+const PR_COUNT = 3;
 
 const GET_REPO = graphql`
-  query RepoQuery($name: String!, $owner: String!) {
+  query RepoQuery($name: String!, $owner: String!, $prCount: Int!) {
     repository(name: $name, owner: $owner) {
       url
+      homepageUrl
       releases(last: 1) {
         nodes {
           publishedAt
@@ -31,7 +36,7 @@ const GET_REPO = graphql`
       }
       pullRequests(
         states: OPEN
-        first: 10
+        first: $prCount
         orderBy: { field: UPDATED_AT, direction: DESC }
       ) {
         totalCount
@@ -43,19 +48,16 @@ const GET_REPO = graphql`
   }
 `;
 
-const renderPRs = (pullRequests: Array<PullRequest_pr$key | null>) =>
-  pullRequests
-    .map((node, index) => {
-      return node ? <PullRequest key={index} pr={node} /> : null;
-    })
-    .filter(Boolean);
-
 interface RepoProps {
   owner: string;
   name: string;
 }
 export function Repo({ owner, name }: RepoProps) {
-  const { error, props } = useQuery<RepoQuery>(GET_REPO, { owner, name });
+  const { error, props } = useQuery<RepoQuery>(GET_REPO, {
+    owner,
+    name,
+    prCount: PR_COUNT,
+  });
 
   if (!props || !props.repository) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
@@ -65,18 +67,27 @@ export function Repo({ owner, name }: RepoProps) {
   const releases = repository.releases?.nodes;
   const latestRelease = releases ? releases[0] : null;
   const pullRequests = repository.pullRequests?.nodes ?? [];
+  const totalPRs = repository.pullRequests.totalCount;
 
   return (
     <Card>
       <Stack spacing="major-1">
         <Columns>
-          <Columns.Column spread={1}>
-            <Badge palette="success" />
-          </Columns.Column>
           <Columns.Column>
-            <Link href={repository.url}>
-              <Heading use="h4">{name}</Heading>
-            </Link>
+            <Stack>
+              <Set>
+                {repository.homepageUrl ? (
+                  <Link href={repository.homepageUrl}>
+                    <Icon fontSize="300" top="3px" icon="solid-globe-asia">
+                      {repository.homepageUrl}
+                    </Icon>
+                  </Link>
+                ) : null}
+                <Link href={repository.url}>
+                  <Heading use="h4">{name}</Heading>
+                </Link>
+              </Set>
+            </Stack>
           </Columns.Column>
           <Columns.Column spread={3}>
             {latestRelease ? (
@@ -106,6 +117,7 @@ export function Repo({ owner, name }: RepoProps) {
             })
             .filter(Boolean)
         )}
+        {totalPRs > PR_COUNT ? <Text>{totalPRs - PR_COUNT} more</Text> : null}
       </Stack>
     </Card>
   );

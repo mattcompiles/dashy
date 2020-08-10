@@ -7,10 +7,12 @@ import { FragmentRefs } from "relay-runtime";
 export type RepoQueryVariables = {
     name: string;
     owner: string;
+    prCount: number;
 };
 export type RepoQueryResponse = {
     readonly repository: {
         readonly url: string;
+        readonly homepageUrl: string | null;
         readonly releases: {
             readonly nodes: ReadonlyArray<{
                 readonly publishedAt: string | null;
@@ -38,9 +40,11 @@ export type RepoQuery = {
 query RepoQuery(
   $name: String!
   $owner: String!
+  $prCount: Int!
 ) {
   repository(name: $name, owner: $owner) {
     url
+    homepageUrl
     releases(last: 1) {
       nodes {
         publishedAt
@@ -50,7 +54,7 @@ query RepoQuery(
         id
       }
     }
-    pullRequests(states: OPEN, first: 10, orderBy: {field: UPDATED_AT, direction: DESC}) {
+    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {
       totalCount
       nodes {
         ...PullRequest_pr
@@ -112,6 +116,11 @@ var v0 = [
     "defaultValue": null,
     "kind": "LocalArgument",
     "name": "owner"
+  },
+  {
+    "defaultValue": null,
+    "kind": "LocalArgument",
+    "name": "prCount"
   }
 ],
 v1 = [
@@ -134,41 +143,47 @@ v2 = {
   "storageKey": null
 },
 v3 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "homepageUrl",
+  "storageKey": null
+},
+v4 = {
   "kind": "Literal",
   "name": "last",
   "value": 1
 },
-v4 = [
-  (v3/*: any*/)
+v5 = [
+  (v4/*: any*/)
 ],
-v5 = {
+v6 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "publishedAt",
   "storageKey": null
 },
-v6 = {
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "description",
   "storageKey": null
 },
-v7 = {
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "tagName",
   "storageKey": null
 },
-v8 = {
-  "kind": "Literal",
-  "name": "first",
-  "value": 10
-},
 v9 = [
-  (v8/*: any*/),
+  {
+    "kind": "Variable",
+    "name": "first",
+    "variableName": "prCount"
+  },
   {
     "kind": "Literal",
     "name": "orderBy",
@@ -222,9 +237,10 @@ return {
         "plural": false,
         "selections": [
           (v2/*: any*/),
+          (v3/*: any*/),
           {
             "alias": null,
-            "args": (v4/*: any*/),
+            "args": (v5/*: any*/),
             "concreteType": "ReleaseConnection",
             "kind": "LinkedField",
             "name": "releases",
@@ -238,10 +254,10 @@ return {
                 "name": "nodes",
                 "plural": true,
                 "selections": [
-                  (v5/*: any*/),
                   (v6/*: any*/),
+                  (v7/*: any*/),
                   (v2/*: any*/),
-                  (v7/*: any*/)
+                  (v8/*: any*/)
                 ],
                 "storageKey": null
               }
@@ -274,7 +290,7 @@ return {
                 "storageKey": null
               }
             ],
-            "storageKey": "pullRequests(first:10,orderBy:{\"direction\":\"DESC\",\"field\":\"UPDATED_AT\"},states:\"OPEN\")"
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -298,9 +314,10 @@ return {
         "plural": false,
         "selections": [
           (v2/*: any*/),
+          (v3/*: any*/),
           {
             "alias": null,
-            "args": (v4/*: any*/),
+            "args": (v5/*: any*/),
             "concreteType": "ReleaseConnection",
             "kind": "LinkedField",
             "name": "releases",
@@ -314,10 +331,10 @@ return {
                 "name": "nodes",
                 "plural": true,
                 "selections": [
-                  (v5/*: any*/),
                   (v6/*: any*/),
-                  (v2/*: any*/),
                   (v7/*: any*/),
+                  (v2/*: any*/),
+                  (v8/*: any*/),
                   (v11/*: any*/)
                 ],
                 "storageKey": null
@@ -373,7 +390,7 @@ return {
                   (v2/*: any*/),
                   {
                     "alias": null,
-                    "args": (v4/*: any*/),
+                    "args": (v5/*: any*/),
                     "concreteType": "PullRequestCommitConnection",
                     "kind": "LinkedField",
                     "name": "commits",
@@ -420,7 +437,11 @@ return {
                                   {
                                     "alias": null,
                                     "args": [
-                                      (v8/*: any*/)
+                                      {
+                                        "kind": "Literal",
+                                        "name": "first",
+                                        "value": 10
+                                      }
                                     ],
                                     "concreteType": "StatusCheckRollupContextConnection",
                                     "kind": "LinkedField",
@@ -457,7 +478,7 @@ return {
                           "PULL_REQUEST_REVIEW"
                         ]
                       },
-                      (v3/*: any*/)
+                      (v4/*: any*/)
                     ],
                     "concreteType": "PullRequestTimelineItemsConnection",
                     "kind": "LinkedField",
@@ -510,7 +531,7 @@ return {
                 "storageKey": null
               }
             ],
-            "storageKey": "pullRequests(first:10,orderBy:{\"direction\":\"DESC\",\"field\":\"UPDATED_AT\"},states:\"OPEN\")"
+            "storageKey": null
           },
           (v11/*: any*/)
         ],
@@ -519,14 +540,14 @@ return {
     ]
   },
   "params": {
-    "cacheID": "4189f46b38e055fb5d88c028ad867684",
+    "cacheID": "a083e703a01134537d6f599abda2a6a8",
     "id": null,
     "metadata": {},
     "name": "RepoQuery",
     "operationKind": "query",
-    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: 10, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        statusCheckRollup {\n          state\n          contexts(first: 10) {\n            totalCount\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
+    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        statusCheckRollup {\n          state\n          contexts(first: 10) {\n            totalCount\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
-(node as any).hash = '5247e1acb1f4f39107e30bb2b1e90bb8';
+(node as any).hash = 'ac506cdd6f76def1e59e9a9fadf25812';
 export default node;
