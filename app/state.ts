@@ -20,3 +20,8 @@ export const tokenState = atom<string | undefined>({
       ? localStorage.getItem('githubToken') ?? undefined
       : undefined,
 });
+
+export const lastFetchState = atom<Date>({
+  key: 'fetchKey',
+  default: new Date(),
+});

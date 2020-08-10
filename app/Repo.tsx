@@ -15,9 +15,11 @@ import {
   Set,
 } from 'bumbag';
 import { format } from 'date-fns';
+import { useRecoilValue } from 'recoil';
 
 import { PullRequest } from './PullRequest';
 import { RepoQuery } from './__generated__/RepoQuery.graphql';
+import { lastFetchState } from './state';
 
 const PR_COUNT = 3;
 
@@ -53,11 +55,16 @@ interface RepoProps {
   name: string;
 }
 export function Repo({ owner, name }: RepoProps) {
-  const { error, props } = useQuery<RepoQuery>(GET_REPO, {
-    owner,
-    name,
-    prCount: PR_COUNT,
-  });
+  const lastFetch = useRecoilValue(lastFetchState);
+  const { error, props } = useQuery<RepoQuery>(
+    GET_REPO,
+    {
+      owner,
+      name,
+      prCount: PR_COUNT,
+    },
+    { fetchKey: lastFetch.getTime(), fetchPolicy: 'store-and-network' },
+  );
 
   if (!props || !props.repository) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
@@ -70,7 +77,7 @@ export function Repo({ owner, name }: RepoProps) {
   const totalPRs = repository.pullRequests.totalCount;
 
   return (
-    <Card>
+    <Card footer={<Text use="sub">{}</Text>}>
       <Stack spacing="major-1">
         <Columns>
           <Columns.Column>
