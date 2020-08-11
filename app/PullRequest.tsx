@@ -2,15 +2,18 @@ import React from 'react';
 import { Columns, Tag, Button, Link, Stack, Set, Text } from 'bumbag';
 import { formatDistanceToNow } from 'date-fns';
 import { useFragment, graphql } from 'relay-hooks';
+import { useRecoilValue } from 'recoil';
 
 import {
   PullRequest_pr$key,
   StatusState,
   PullRequestReviewDecision,
 } from './__generated__/PullRequest_pr.graphql';
+import { tokenState } from './state';
 
 const pullRequestFragment = graphql`
   fragment PullRequest_pr on PullRequest {
+    number
     title
     mergeable
     viewerDidAuthor
@@ -20,6 +23,7 @@ const pullRequestFragment = graphql`
       nodes {
         commit {
           pushedDate
+          oid
           statusCheckRollup {
             state
             contexts(first: 10) {
@@ -70,9 +74,12 @@ function statusToPallete(status: StatusState | undefined) {
 
 interface PullRequestProps {
   pr: PullRequest_pr$key;
+  repoName: string;
+  repoOwner: string;
 }
-export function PullRequest({ pr }: PullRequestProps) {
+export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
   const {
+    number,
     title,
     url,
     reviewDecision,
@@ -80,14 +87,15 @@ export function PullRequest({ pr }: PullRequestProps) {
     commits,
     timelineItems,
   } = useFragment(pullRequestFragment, pr);
+  const token = useRecoilValue(tokenState);
 
   const lastActivity = timelineItems.nodes
     ? timelineItems.nodes[0]?.updatedAt
     : null;
 
-  const lastCodeUpdate = commits.nodes
-    ? commits.nodes[0]?.commit.pushedDate
-    : null;
+  const latestCommit = commits.nodes ? commits.nodes[0]?.commit : null;
+
+  const lastCodeUpdate = latestCommit ? latestCommit.pushedDate : null;
 
   const status = commits.nodes
     ? commits.nodes[0]?.commit.statusCheckRollup?.state
@@ -99,6 +107,28 @@ export function PullRequest({ pr }: PullRequestProps) {
 
   const canMerge =
     mergeable && reviewDecision === 'APPROVED' && status === 'SUCCESS';
+
+  const updatePR = () => {
+    fetch(
+      `https://api.github.com/repos/${repoOwner}/${repoName}/pulls/${number}/update-branch`,
+      {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/vnd.github.lydian-preview+json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          expected_head_sha: latestCommit?.oid,
+        }),
+      },
+    )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
 
   return (
     <Columns>
@@ -132,7 +162,9 @@ export function PullRequest({ pr }: PullRequestProps) {
       ) : null}
       {!mergeable ? (
         <Columns.Column spread={2}>
-          <Button size="small">Update</Button>
+          <Button size="small" onClick={updatePR}>
+            Update
+          </Button>
         </Columns.Column>
       ) : null}
       <Columns.Column spread={1}>

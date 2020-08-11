@@ -120,7 +120,14 @@ export function Repo({ owner, name }: RepoProps) {
         ) : (
           pullRequests
             .map((node, index) => {
-              return node ? <PullRequest key={index} pr={node} /> : null;
+              return node ? (
+                <PullRequest
+                  key={index}
+                  pr={node}
+                  repoName={name}
+                  repoOwner={owner}
+                />
+              ) : null;
             })
             .filter(Boolean)
         )}

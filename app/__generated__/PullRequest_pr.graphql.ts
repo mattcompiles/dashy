@@ -8,6 +8,7 @@ export type MergeableState = "CONFLICTING" | "MERGEABLE" | "UNKNOWN" | "%future 
 export type PullRequestReviewDecision = "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | "%future added value";
 export type StatusState = "ERROR" | "EXPECTED" | "FAILURE" | "PENDING" | "SUCCESS" | "%future added value";
 export type PullRequest_pr = {
+    readonly number: number;
     readonly title: string;
     readonly mergeable: MergeableState;
     readonly viewerDidAuthor: boolean;
@@ -17,6 +18,7 @@ export type PullRequest_pr = {
         readonly nodes: ReadonlyArray<{
             readonly commit: {
                 readonly pushedDate: string | null;
+                readonly oid: string;
                 readonly statusCheckRollup: {
                     readonly state: StatusState;
                     readonly contexts: {
@@ -62,6 +64,13 @@ return {
   "metadata": null,
   "name": "PullRequest_pr",
   "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "number",
+      "storageKey": null
+    },
     {
       "alias": null,
       "args": null,
@@ -128,6 +137,13 @@ return {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "pushedDate",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "oid",
                   "storageKey": null
                 },
                 {
@@ -230,5 +246,5 @@ return {
   "abstractKey": null
 };
 })();
-(node as any).hash = 'a6cb42fe64711d7d1af30f0785759771';
+(node as any).hash = '085a64740cbe9e221b736c9c4d83b0bb';
 export default node;

@@ -66,6 +66,7 @@ query RepoQuery(
 }
 
 fragment PullRequest_pr on PullRequest {
+  number
   title
   mergeable
   viewerDidAuthor
@@ -75,6 +76,7 @@ fragment PullRequest_pr on PullRequest {
     nodes {
       commit {
         pushedDate
+        oid
         statusCheckRollup {
           state
           contexts(first: 10) {
@@ -363,6 +365,13 @@ return {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
+                    "name": "number",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
                     "name": "title",
                     "storageKey": null
                   },
@@ -417,6 +426,13 @@ return {
                                 "args": null,
                                 "kind": "ScalarField",
                                 "name": "pushedDate",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "oid",
                                 "storageKey": null
                               },
                               {
@@ -540,12 +556,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a083e703a01134537d6f599abda2a6a8",
+    "cacheID": "a93455afcdeab8936e9b22f5caeb50e2",
     "id": null,
     "metadata": {},
     "name": "RepoQuery",
     "operationKind": "query",
-    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        statusCheckRollup {\n          state\n          contexts(first: 10) {\n            totalCount\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
+    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 10) {\n            totalCount\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();

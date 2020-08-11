@@ -7,5 +7,6 @@ module.exports = {
   customScalars: {
     URI: 'String',
     DateTime: 'String',
+    GitObjectID: 'String',
   },
 };
