@@ -14,6 +14,10 @@ export type PullRequest_pr = {
     readonly viewerDidAuthor: boolean;
     readonly reviewDecision: PullRequestReviewDecision | null;
     readonly url: string;
+    readonly author: {
+        readonly avatarUrl: string;
+        readonly login: string;
+    } | null;
     readonly commits: {
         readonly nodes: ReadonlyArray<{
             readonly commit: {
@@ -104,6 +108,31 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "url",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": null,
+      "kind": "LinkedField",
+      "name": "author",
+      "plural": false,
+      "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "avatarUrl",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "login",
+          "storageKey": null
+        }
+      ],
       "storageKey": null
     },
     {
@@ -246,5 +275,5 @@ return {
   "abstractKey": null
 };
 })();
-(node as any).hash = '085a64740cbe9e221b736c9c4d83b0bb';
+(node as any).hash = 'c955fb48ebfd5dea5c83b9d433786b70';
 export default node;

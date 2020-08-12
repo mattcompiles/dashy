@@ -1,13 +1,20 @@
+import './_app.css';
+
 import NextApp from 'next/app';
 import { Provider as BumbagProvider } from 'bumbag';
 import { RecoilRoot } from 'recoil';
-import { faCode, faGlobeAsia, faSync } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCode,
+  faGlobeAsia,
+  faSync,
+  faComment,
+} from '@fortawesome/free-solid-svg-icons';
 
 const theme = {
   Icon: {
     iconSets: [
       {
-        icons: [faCode, faGlobeAsia, faSync],
+        icons: [faCode, faGlobeAsia, faSync, faComment],
         prefix: 'solid-',
         type: 'font-awesome',
       },

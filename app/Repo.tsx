@@ -77,62 +77,43 @@ export function Repo({ owner, name }: RepoProps) {
   const totalPRs = repository.pullRequests.totalCount;
 
   return (
-    <Card footer={<Text use="sub">{}</Text>}>
-      <Stack spacing="major-1">
-        <Columns>
-          <Columns.Column>
-            <Stack>
-              <Set>
-                {repository.homepageUrl ? (
-                  <Link href={repository.homepageUrl}>
-                    <Icon fontSize="300" top="3px" icon="solid-globe-asia">
-                      {repository.homepageUrl}
-                    </Icon>
-                  </Link>
-                ) : null}
-                <Link href={repository.url}>
-                  <Heading use="h4">{name}</Heading>
-                </Link>
-              </Set>
-            </Stack>
-          </Columns.Column>
-          <Columns.Column spread={3}>
-            {latestRelease ? (
-              <Fragment>
-                <Box>
-                  <Link href={latestRelease.url}>{latestRelease.tagName}</Link>
-                </Box>
-                {latestRelease.publishedAt ? (
-                  <Box>
-                    <Text use="sub">
-                      {format(new Date(latestRelease.publishedAt), 'PP')}
-                    </Text>
-                  </Box>
-                ) : null}
-              </Fragment>
-            ) : null}
-          </Columns.Column>
-        </Columns>
-
-        <Divider />
-        {repository.pullRequests.totalCount === 0 ? (
-          <Text>No open pull requests</Text>
-        ) : (
-          pullRequests
-            .map((node, index) => {
-              return node ? (
-                <PullRequest
-                  key={index}
-                  pr={node}
-                  repoName={name}
-                  repoOwner={owner}
-                />
-              ) : null;
-            })
-            .filter(Boolean)
-        )}
-        {totalPRs > PR_COUNT ? <Text>{totalPRs - PR_COUNT} more</Text> : null}
-      </Stack>
-    </Card>
+    <div className="rounded-md shadow-md bg-white">
+      <div className="space-y-1 divide-y-2">
+        <div className="flex p-4 space-x-3 border-bt">
+          {repository.homepageUrl ? (
+            <a href={repository.homepageUrl} className="text-blue-600">
+              <Icon fontSize="300" top="6px" icon="solid-globe-asia">
+                {repository.homepageUrl}
+              </Icon>
+            </a>
+          ) : null}
+          <a
+            href={repository.url}
+            className="font-sans text-xl font-medium text-blue-600"
+          >
+            {name}
+          </a>
+        </div>
+        <div className="px-4 py-2 space-y-4">
+          {repository.pullRequests.totalCount === 0 ? (
+            <Text>No open pull requests</Text>
+          ) : (
+            pullRequests
+              .map((node, index) => {
+                return node ? (
+                  <PullRequest
+                    key={index}
+                    pr={node}
+                    repoName={name}
+                    repoOwner={owner}
+                  />
+                ) : null;
+              })
+              .filter(Boolean)
+          )}
+          {totalPRs > PR_COUNT ? <Text>{totalPRs - PR_COUNT} more</Text> : null}
+        </div>
+      </div>
+    </div>
   );
 }

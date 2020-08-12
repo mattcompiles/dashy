@@ -60,7 +60,7 @@ export function App() {
   return (
     <RelayEnvironmentProvider environment={relayEnvironment}>
       <PageWithHeader header={header}>
-        <Box padding="major-3">
+        <div className="bg-gray-100 p-4">
           <Columns spacing="major-3">
             {tileColumns.map((tileColumn, index) => (
               <Columns.Column key={index}>
@@ -85,7 +85,7 @@ export function App() {
               </Columns.Column>
             ))}
           </Columns>
-        </Box>
+        </div>
         <Modal.State>
           <Box position="fixed" bottom="20px" right="20px">
             <Modal.Disclosure use={Button}>Settings</Modal.Disclosure>
