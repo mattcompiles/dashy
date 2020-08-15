@@ -77,19 +77,19 @@ export function Repo({ owner, name }: RepoProps) {
   const totalPRs = repository.pullRequests.totalCount;
 
   return (
-    <div className="rounded-md shadow-md bg-white">
+    <div className="rounded-md shadow-md bg-white pb-2">
       <div className="space-y-1 divide-y-2">
         <div className="flex p-4 space-x-3 border-bt">
           {repository.homepageUrl ? (
             <a href={repository.homepageUrl} className="text-blue-600">
-              <Icon fontSize="300" top="6px" icon="solid-globe-asia">
+              <Icon fontSize="300" top="9px" icon="solid-globe-asia">
                 {repository.homepageUrl}
               </Icon>
             </a>
           ) : null}
           <a
             href={repository.url}
-            className="font-sans text-xl font-medium text-blue-600"
+            className="font-sans text-2xl font-bold text-blue-600"
           >
             {name}
           </a>

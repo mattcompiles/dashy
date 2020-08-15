@@ -15,6 +15,7 @@ const makeFetchQuery = (token?: string): FetchFunction => (
     headers: {
       'Content-Type': 'application/json',
       authorization: `Bearer ${token}`,
+      accept: 'application/vnd.github.antiope-preview+json',
     },
     body: JSON.stringify({
       query: operation.text,

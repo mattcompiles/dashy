@@ -1,6 +1,6 @@
 module.exports = {
   src: './app',
-  schema: './node_modules/@octokit/graphql-schema/schema.graphql',
+  schema: './github.schema.graphql',
   extensions: ['ts', 'tsx'],
   exclude: ['**/node_modules/**', '**/__mocks__/**', '**/__generated__/**'],
   language: 'typescript',

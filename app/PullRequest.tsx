@@ -5,12 +5,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { useFragment, graphql } from 'relay-hooks';
 import { useRecoilValue } from 'recoil';
 
-import {
-  PullRequest_pr$key,
-  StatusState,
-  PullRequestReviewDecision,
-} from './__generated__/PullRequest_pr.graphql';
+import { PullRequest_pr$key } from './__generated__/PullRequest_pr.graphql';
 import { tokenState } from './state';
+import { StatusIndicator } from './StatusIndicator';
+import { Switch } from 'bumbag/ts/Switch/styles';
 
 const pullRequestFragment = graphql`
   fragment PullRequest_pr on PullRequest {
@@ -31,8 +29,23 @@ const pullRequestFragment = graphql`
           oid
           statusCheckRollup {
             state
-            contexts(first: 10) {
+            contexts(first: 100) {
               totalCount
+              nodes {
+                __typename
+                ... on StatusContext {
+                  avatarUrl
+                  state
+                  targetUrl
+                  description
+                }
+                ... on CheckRun {
+                  name
+                  status
+                  conclusion
+                  detailsUrl
+                }
+              }
             }
           }
         }
@@ -85,6 +98,10 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
     ? commits.nodes[0]?.commit.statusCheckRollup?.contexts.totalCount
     : null;
 
+  const checks = commits.nodes
+    ? commits.nodes[0]?.commit.statusCheckRollup?.contexts.nodes
+    : null;
+
   const canMerge =
     mergeable && reviewDecision === 'APPROVED' && status === 'SUCCESS';
 
@@ -112,16 +129,14 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
 
   return (
     <div className="flex space-x-3">
-      <div>
-        {author ? (
-          <img src={author.avatarUrl} className="h-8 mr-2 rounded-full" />
-        ) : null}
-      </div>
+      {/* {author ? (
+        <img src={author.avatarUrl} className="h-8 mr-2 rounded-full" />
+      ) : null} */}
       <div className="flex flex-col space-y-2 flex-grow">
-        <a href={url} className="font-sans text-blue-600 text-sm">
+        <a href={url} className="font-sans text-blue-600 text font-medium">
           {title}
         </a>
-        <div className="self-end flex space-x-2 font-sans text-xs text-gray-700">
+        <div className="flex space-x-2 font-sans text-xs text-gray-700">
           {lastCodeUpdate ? (
             <div className="flex space-x-2">
               <Icon top="3px" icon="solid-code" />
@@ -142,31 +157,81 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
           </Button>
         ) : null}
       </div>
-      <div>
-        <div className="flex space-x-1">
-          <div
-            className={clsx(
-              'h-8 w-8 rounded-full flex items-center justify-center',
-              {
-                'bg-green-400': status === 'SUCCESS',
-                'bg-red-600': status === 'ERROR' || status === 'FAILURE',
-                'bg-orange-500': status === 'EXPECTED',
-              },
-            )}
-          >
-            {numChecks}
-          </div>
-          <div
-            className={clsx(
-              'h-8 w-8 rounded-full flex items-center justify-center',
-              {
-                'bg-green-400': reviewDecision === 'APPROVED',
-                'bg-red-600': reviewDecision === 'CHANGES_REQUESTED',
-                'bg-orange-500': reviewDecision === 'REVIEW_REQUIRED',
-              },
-            )}
+      <div className="w-10">
+        {checks ? (
+          <StatusIndicator
+            checks={checks.map((check) => {
+              if (check?.__typename === 'StatusContext') {
+                switch (check.state) {
+                  case 'ERROR':
+                  case 'FAILURE': {
+                    return 'CRITICAL';
+                  }
+
+                  case 'PENDING': {
+                    return 'CAUTION';
+                  }
+
+                  case 'SUCCESS': {
+                    return 'SUCCESS';
+                  }
+
+                  default: {
+                    return 'UNKNOWN';
+                  }
+                }
+              }
+
+              if (check?.__typename === 'CheckRun') {
+                if (check.status !== 'COMPLETED') {
+                  return 'CAUTION';
+                }
+
+                switch (check.conclusion) {
+                  case 'SUCCESS': {
+                    return 'SUCCESS';
+                  }
+
+                  case 'CANCELLED':
+                  case 'FAILURE':
+                  case 'TIMED_OUT': {
+                    return 'CRITICAL';
+                  }
+
+                  default: {
+                    return 'UNKNOWN';
+                  }
+                }
+              }
+
+              return 'UNKNOWN';
+            })}
           />
-        </div>
+        ) : null}
+
+        {/* <StatusIndicator
+          checks={[
+            (() => {
+              switch (reviewDecision) {
+                case 'APPROVED': {
+                  return 'SUCCESS';
+                }
+
+                case 'REVIEW_REQUIRED': {
+                  return 'CAUTION';
+                }
+
+                case 'CHANGES_REQUESTED': {
+                  return 'CRITICAL';
+                }
+
+                default: {
+                  return 'UNKNOWN';
+                }
+              }
+            })(),
+          ]}
+        /> */}
       </div>
     </div>
   );

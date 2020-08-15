@@ -4,6 +4,8 @@
 
 import { ReaderFragment } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
+export type CheckConclusionState = "ACTION_REQUIRED" | "CANCELLED" | "FAILURE" | "NEUTRAL" | "SKIPPED" | "STALE" | "SUCCESS" | "TIMED_OUT" | "%future added value";
+export type CheckStatusState = "COMPLETED" | "IN_PROGRESS" | "QUEUED" | "REQUESTED" | "%future added value";
 export type MergeableState = "CONFLICTING" | "MERGEABLE" | "UNKNOWN" | "%future added value";
 export type PullRequestReviewDecision = "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | "%future added value";
 export type StatusState = "ERROR" | "EXPECTED" | "FAILURE" | "PENDING" | "SUCCESS" | "%future added value";
@@ -27,6 +29,23 @@ export type PullRequest_pr = {
                     readonly state: StatusState;
                     readonly contexts: {
                         readonly totalCount: number;
+                        readonly nodes: ReadonlyArray<({
+                            readonly __typename: "StatusContext";
+                            readonly avatarUrl: string | null;
+                            readonly state: StatusState;
+                            readonly targetUrl: string | null;
+                            readonly description: string | null;
+                        } | {
+                            readonly __typename: "CheckRun";
+                            readonly name: string;
+                            readonly status: CheckStatusState;
+                            readonly conclusion: CheckConclusionState | null;
+                            readonly detailsUrl: string | null;
+                        } | {
+                            /*This will never be '%other', but we need some
+                            value in case none of the concrete values match.*/
+                            readonly __typename: "%other";
+                        }) | null> | null;
                     };
                 } | null;
             };
@@ -49,11 +68,25 @@ export type PullRequest_pr$key = {
 
 const node: ReaderFragment = (function(){
 var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "avatarUrl",
+  "storageKey": null
+},
+v1 = {
   "kind": "Literal",
   "name": "last",
   "value": 1
 },
-v1 = [
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v3 = [
   {
     "alias": null,
     "args": null,
@@ -118,13 +151,7 @@ return {
       "name": "author",
       "plural": false,
       "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "avatarUrl",
-          "storageKey": null
-        },
+        (v0/*: any*/),
         {
           "alias": null,
           "args": null,
@@ -138,7 +165,7 @@ return {
     {
       "alias": null,
       "args": [
-        (v0/*: any*/)
+        (v1/*: any*/)
       ],
       "concreteType": "PullRequestCommitConnection",
       "kind": "LinkedField",
@@ -183,20 +210,14 @@ return {
                   "name": "statusCheckRollup",
                   "plural": false,
                   "selections": [
-                    {
-                      "alias": null,
-                      "args": null,
-                      "kind": "ScalarField",
-                      "name": "state",
-                      "storageKey": null
-                    },
+                    (v2/*: any*/),
                     {
                       "alias": null,
                       "args": [
                         {
                           "kind": "Literal",
                           "name": "first",
-                          "value": 10
+                          "value": 100
                         }
                       ],
                       "concreteType": "StatusCheckRollupContextConnection",
@@ -210,9 +231,85 @@ return {
                           "kind": "ScalarField",
                           "name": "totalCount",
                           "storageKey": null
+                        },
+                        {
+                          "alias": null,
+                          "args": null,
+                          "concreteType": null,
+                          "kind": "LinkedField",
+                          "name": "nodes",
+                          "plural": true,
+                          "selections": [
+                            {
+                              "alias": null,
+                              "args": null,
+                              "kind": "ScalarField",
+                              "name": "__typename",
+                              "storageKey": null
+                            },
+                            {
+                              "kind": "InlineFragment",
+                              "selections": [
+                                (v0/*: any*/),
+                                (v2/*: any*/),
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "targetUrl",
+                                  "storageKey": null
+                                },
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "description",
+                                  "storageKey": null
+                                }
+                              ],
+                              "type": "StatusContext",
+                              "abstractKey": null
+                            },
+                            {
+                              "kind": "InlineFragment",
+                              "selections": [
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "name",
+                                  "storageKey": null
+                                },
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "status",
+                                  "storageKey": null
+                                },
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "conclusion",
+                                  "storageKey": null
+                                },
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "detailsUrl",
+                                  "storageKey": null
+                                }
+                              ],
+                              "type": "CheckRun",
+                              "abstractKey": null
+                            }
+                          ],
+                          "storageKey": null
                         }
                       ],
-                      "storageKey": "contexts(first:10)"
+                      "storageKey": "contexts(first:100)"
                     }
                   ],
                   "storageKey": null
@@ -237,7 +334,7 @@ return {
             "PULL_REQUEST_REVIEW"
           ]
         },
-        (v0/*: any*/)
+        (v1/*: any*/)
       ],
       "concreteType": "PullRequestTimelineItemsConnection",
       "kind": "LinkedField",
@@ -254,13 +351,13 @@ return {
           "selections": [
             {
               "kind": "InlineFragment",
-              "selections": (v1/*: any*/),
+              "selections": (v3/*: any*/),
               "type": "IssueComment",
               "abstractKey": null
             },
             {
               "kind": "InlineFragment",
-              "selections": (v1/*: any*/),
+              "selections": (v3/*: any*/),
               "type": "PullRequestReview",
               "abstractKey": null
             }
@@ -275,5 +372,5 @@ return {
   "abstractKey": null
 };
 })();
-(node as any).hash = 'c955fb48ebfd5dea5c83b9d433786b70';
+(node as any).hash = '0c8d7f13fe98c79bcc5db84efd49b31f';
 export default node;

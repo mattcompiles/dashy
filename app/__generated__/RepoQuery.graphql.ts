@@ -88,8 +88,27 @@ fragment PullRequest_pr on PullRequest {
         oid
         statusCheckRollup {
           state
-          contexts(first: 10) {
+          contexts(first: 100) {
             totalCount
+            nodes {
+              __typename
+              ... on StatusContext {
+                avatarUrl
+                state
+                targetUrl
+                description
+              }
+              ... on CheckRun {
+                name
+                status
+                conclusion
+                detailsUrl
+              }
+              ... on Node {
+                __isNode: __typename
+                id
+              }
+            }
           }
           id
         }
@@ -231,6 +250,13 @@ v12 = {
   "storageKey": null
 },
 v13 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "avatarUrl",
+  "storageKey": null
+},
+v14 = {
   "kind": "InlineFragment",
   "selections": [
     (v11/*: any*/)
@@ -238,7 +264,14 @@ v13 = {
   "type": "Node",
   "abstractKey": "__isNode"
 },
-v14 = [
+v15 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v16 = [
   {
     "alias": null,
     "args": null,
@@ -430,13 +463,7 @@ return {
                     "plural": false,
                     "selections": [
                       (v12/*: any*/),
-                      {
-                        "alias": null,
-                        "args": null,
-                        "kind": "ScalarField",
-                        "name": "avatarUrl",
-                        "storageKey": null
-                      },
+                      (v13/*: any*/),
                       {
                         "alias": null,
                         "args": null,
@@ -444,7 +471,7 @@ return {
                         "name": "login",
                         "storageKey": null
                       },
-                      (v13/*: any*/)
+                      (v14/*: any*/)
                     ],
                     "storageKey": null
                   },
@@ -494,20 +521,14 @@ return {
                                 "name": "statusCheckRollup",
                                 "plural": false,
                                 "selections": [
-                                  {
-                                    "alias": null,
-                                    "args": null,
-                                    "kind": "ScalarField",
-                                    "name": "state",
-                                    "storageKey": null
-                                  },
+                                  (v15/*: any*/),
                                   {
                                     "alias": null,
                                     "args": [
                                       {
                                         "kind": "Literal",
                                         "name": "first",
-                                        "value": 10
+                                        "value": 100
                                       }
                                     ],
                                     "concreteType": "StatusCheckRollupContextConnection",
@@ -515,9 +536,74 @@ return {
                                     "name": "contexts",
                                     "plural": false,
                                     "selections": [
-                                      (v10/*: any*/)
+                                      (v10/*: any*/),
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "concreteType": null,
+                                        "kind": "LinkedField",
+                                        "name": "nodes",
+                                        "plural": true,
+                                        "selections": [
+                                          (v12/*: any*/),
+                                          {
+                                            "kind": "InlineFragment",
+                                            "selections": [
+                                              (v13/*: any*/),
+                                              (v15/*: any*/),
+                                              {
+                                                "alias": null,
+                                                "args": null,
+                                                "kind": "ScalarField",
+                                                "name": "targetUrl",
+                                                "storageKey": null
+                                              },
+                                              (v7/*: any*/)
+                                            ],
+                                            "type": "StatusContext",
+                                            "abstractKey": null
+                                          },
+                                          {
+                                            "kind": "InlineFragment",
+                                            "selections": [
+                                              {
+                                                "alias": null,
+                                                "args": null,
+                                                "kind": "ScalarField",
+                                                "name": "name",
+                                                "storageKey": null
+                                              },
+                                              {
+                                                "alias": null,
+                                                "args": null,
+                                                "kind": "ScalarField",
+                                                "name": "status",
+                                                "storageKey": null
+                                              },
+                                              {
+                                                "alias": null,
+                                                "args": null,
+                                                "kind": "ScalarField",
+                                                "name": "conclusion",
+                                                "storageKey": null
+                                              },
+                                              {
+                                                "alias": null,
+                                                "args": null,
+                                                "kind": "ScalarField",
+                                                "name": "detailsUrl",
+                                                "storageKey": null
+                                              }
+                                            ],
+                                            "type": "CheckRun",
+                                            "abstractKey": null
+                                          },
+                                          (v14/*: any*/)
+                                        ],
+                                        "storageKey": null
+                                      }
                                     ],
-                                    "storageKey": "contexts(first:10)"
+                                    "storageKey": "contexts(first:100)"
                                   },
                                   (v11/*: any*/)
                                 ],
@@ -563,17 +649,17 @@ return {
                           (v12/*: any*/),
                           {
                             "kind": "InlineFragment",
-                            "selections": (v14/*: any*/),
+                            "selections": (v16/*: any*/),
                             "type": "IssueComment",
                             "abstractKey": null
                           },
                           {
                             "kind": "InlineFragment",
-                            "selections": (v14/*: any*/),
+                            "selections": (v16/*: any*/),
                             "type": "PullRequestReview",
                             "abstractKey": null
                           },
-                          (v13/*: any*/)
+                          (v14/*: any*/)
                         ],
                         "storageKey": null
                       }
@@ -594,12 +680,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "52e9cc0464193dc411a0ba82facbddef",
+    "cacheID": "9df03d611d88261b18741a8fccdc6764",
     "id": null,
     "metadata": {},
     "name": "RepoQuery",
     "operationKind": "query",
-    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  author {\n    __typename\n    avatarUrl\n    login\n    ... on Node {\n      __isNode: __typename\n      id\n    }\n  }\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 10) {\n            totalCount\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
+    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  author {\n    __typename\n    avatarUrl\n    login\n    ... on Node {\n      __isNode: __typename\n      id\n    }\n  }\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 100) {\n            totalCount\n            nodes {\n              __typename\n              ... on StatusContext {\n                avatarUrl\n                state\n                targetUrl\n                description\n              }\n              ... on CheckRun {\n                name\n                status\n                conclusion\n                detailsUrl\n              }\n              ... on Node {\n                __isNode: __typename\n                id\n              }\n            }\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
