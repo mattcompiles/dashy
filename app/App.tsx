@@ -60,7 +60,7 @@ export function App() {
   return (
     <RelayEnvironmentProvider environment={relayEnvironment}>
       <PageWithHeader header={header}>
-        <div className="bg-gray-100 p-4">
+        <div className="p-4">
           <Columns spacing="major-3">
             {tileColumns.map((tileColumn, index) => (
               <Columns.Column key={index}>

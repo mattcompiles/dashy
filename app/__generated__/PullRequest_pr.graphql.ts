@@ -16,6 +16,7 @@ export type PullRequest_pr = {
     readonly viewerDidAuthor: boolean;
     readonly reviewDecision: PullRequestReviewDecision | null;
     readonly url: string;
+    readonly isDraft: boolean;
     readonly author: {
         readonly avatarUrl: string;
         readonly login: string;
@@ -141,6 +142,13 @@ return {
       "args": null,
       "kind": "ScalarField",
       "name": "url",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "isDraft",
       "storageKey": null
     },
     {
@@ -372,5 +380,5 @@ return {
   "abstractKey": null
 };
 })();
-(node as any).hash = '0c8d7f13fe98c79bcc5db84efd49b31f';
+(node as any).hash = 'f6c1c59f57d8a58de0572a15800b4298';
 export default node;

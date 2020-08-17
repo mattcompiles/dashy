@@ -72,6 +72,7 @@ fragment PullRequest_pr on PullRequest {
   viewerDidAuthor
   reviewDecision
   url
+  isDraft
   author {
     __typename
     avatarUrl
@@ -457,6 +458,13 @@ return {
                   {
                     "alias": null,
                     "args": null,
+                    "kind": "ScalarField",
+                    "name": "isDraft",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
                     "concreteType": null,
                     "kind": "LinkedField",
                     "name": "author",
@@ -680,12 +688,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "9df03d611d88261b18741a8fccdc6764",
+    "cacheID": "d9f4e78f1a58d01915d7b26882d327e1",
     "id": null,
     "metadata": {},
     "name": "RepoQuery",
     "operationKind": "query",
-    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  author {\n    __typename\n    avatarUrl\n    login\n    ... on Node {\n      __isNode: __typename\n      id\n    }\n  }\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 100) {\n            totalCount\n            nodes {\n              __typename\n              ... on StatusContext {\n                avatarUrl\n                state\n                targetUrl\n                description\n              }\n              ... on CheckRun {\n                name\n                status\n                conclusion\n                detailsUrl\n              }\n              ... on Node {\n                __isNode: __typename\n                id\n              }\n            }\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
+    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  isDraft\n  author {\n    __typename\n    avatarUrl\n    login\n    ... on Node {\n      __isNode: __typename\n      id\n    }\n  }\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 100) {\n            totalCount\n            nodes {\n              __typename\n              ... on StatusContext {\n                avatarUrl\n                state\n                targetUrl\n                description\n              }\n              ... on CheckRun {\n                name\n                status\n                conclusion\n                detailsUrl\n              }\n              ... on Node {\n                __isNode: __typename\n                id\n              }\n            }\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();

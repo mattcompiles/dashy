@@ -18,6 +18,7 @@ const pullRequestFragment = graphql`
     viewerDidAuthor
     reviewDecision
     url
+    isDraft
     author {
       avatarUrl
       login
@@ -78,6 +79,7 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
     mergeable,
     commits,
     timelineItems,
+    isDraft,
     author,
   } = useFragment(pullRequestFragment, pr);
   const token = useRecoilValue(tokenState);
@@ -128,12 +130,15 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
   };
 
   return (
-    <div className="flex space-x-3">
+    <div className="flex space-x-3 pt-4">
       {/* {author ? (
         <img src={author.avatarUrl} className="h-8 mr-2 rounded-full" />
       ) : null} */}
       <div className="flex flex-col space-y-2 flex-grow">
-        <a href={url} className="font-sans text-blue-600 text font-medium">
+        <a
+          href={url}
+          className="font-sans text-gray-700 font-medium hover:underline"
+        >
           {title}
         </a>
         <div className="flex space-x-2 font-sans text-xs text-gray-700">
@@ -149,6 +154,7 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
               <span>{formatDistanceToNow(new Date(lastActivity))}</span>
             </div>
           ) : null}
+          {isDraft ? <span>Draft</span> : null}
         </div>
         {canMerge ? <Button size="small">Merge</Button> : null}
         {!mergeable ? (

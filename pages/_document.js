@@ -25,6 +25,9 @@ export default class MyDocument extends Document {
         <Head />
         <body>
           <style>{`
+          body {
+            background: #f7fafc;
+          }
           #__next-prerender-indicator {
             display: none;
           }

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, ReactNode } from 'react';
 import { graphql, useQuery } from 'relay-hooks';
 import {
   Box,
@@ -50,6 +50,17 @@ const GET_REPO = graphql`
   }
 `;
 
+interface DetailProps {
+  label: ReactNode;
+  value: ReactNode;
+}
+const Detail = ({ label, value }: DetailProps) => (
+  <div className="font-sans">
+    <div className="text-gray-600 text-xs">{label}</div>
+    <div className="text-sm">{value}</div>
+  </div>
+);
+
 interface RepoProps {
   owner: string;
   name: string;
@@ -77,41 +88,50 @@ export function Repo({ owner, name }: RepoProps) {
   const totalPRs = repository.pullRequests.totalCount;
 
   return (
-    <div className="rounded-md shadow-md bg-white pb-2">
-      <div className="space-y-1 divide-y-2">
-        <div className="flex p-4 space-x-3 border-bt">
+    <div>
+      <div className="flex pb-2 px-1 justify-between text-gray-500 hover:text-black transition duration-300 ease-in-out">
+        <span>Repo</span>
+        <Icon top="4px" fontSize="200" icon="solid-cog" />
+      </div>
+      <div className="rounded-md shadow-md bg-white p-4 space-y-2 divide-y-2">
+        <div className="flex justify-between">
+          <a href={repository.url} className="font-sans text-lg font-medium">
+            <div className="text-sm text-gray-500">{owner} /</div>
+            <div className="hover:underline">{name}</div>
+          </a>
           {repository.homepageUrl ? (
-            <a href={repository.homepageUrl} className="text-blue-600">
-              <Icon fontSize="300" top="9px" icon="solid-globe-asia">
-                {repository.homepageUrl}
-              </Icon>
+            <a href={repository.homepageUrl} className="flex text-gray-800">
+              <span className="pr-1">
+                <Icon fontSize="200" top="7px" icon="solid-globe-asia">
+                  {repository.homepageUrl}
+                </Icon>
+              </span>
             </a>
           ) : null}
-          <a
-            href={repository.url}
-            className="font-sans text-2xl font-bold text-blue-600"
-          >
-            {name}
-          </a>
         </div>
-        <div className="px-4 py-2 space-y-4">
-          {repository.pullRequests.totalCount === 0 ? (
-            <Text>No open pull requests</Text>
-          ) : (
-            pullRequests
-              .map((node, index) => {
-                return node ? (
-                  <PullRequest
-                    key={index}
-                    pr={node}
-                    repoName={name}
-                    repoOwner={owner}
-                  />
-                ) : null;
-              })
-              .filter(Boolean)
-          )}
-          {totalPRs > PR_COUNT ? <Text>{totalPRs - PR_COUNT} more</Text> : null}
+
+        <div>
+          <div className="pb-4 space-y-4 divide-y">
+            {repository.pullRequests.totalCount === 0 ? (
+              <Text>No open pull requests</Text>
+            ) : (
+              pullRequests
+                .map((node, index) => {
+                  return node ? (
+                    <PullRequest
+                      key={index}
+                      pr={node}
+                      repoName={name}
+                      repoOwner={owner}
+                    />
+                  ) : null;
+                })
+                .filter(Boolean)
+            )}
+            {totalPRs > PR_COUNT ? (
+              <Text>{totalPRs - PR_COUNT} more</Text>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

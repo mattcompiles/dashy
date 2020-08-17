@@ -8,13 +8,14 @@ import {
   faGlobeAsia,
   faSync,
   faComment,
+  faCog,
 } from '@fortawesome/free-solid-svg-icons';
 
 const theme = {
   Icon: {
     iconSets: [
       {
-        icons: [faCode, faGlobeAsia, faSync, faComment],
+        icons: [faCode, faGlobeAsia, faSync, faComment, faCog],
         prefix: 'solid-',
         type: 'font-awesome',
       },
