@@ -93,14 +93,30 @@ export function Repo({ owner, name }: RepoProps) {
         <span>Repo</span>
         <Icon top="4px" fontSize="200" icon="solid-cog" />
       </div>
-      <div className="rounded-md shadow-md bg-white p-4 space-y-2 divide-y-2">
+      <div className="rounded-md shadow bg-white p-4 space-y-2 divide-y-2">
         <div className="flex justify-between">
-          <a href={repository.url} className="font-sans text-lg font-medium">
-            <div className="text-sm text-gray-500">{owner} /</div>
-            <div className="hover:underline">{name}</div>
-          </a>
+          <div>
+            <div className="block font-sans font-medium text-sm text-gray-500">
+              <a
+                href={`https://github.com/${owner}`}
+                className="hover:underline"
+              >
+                {owner}
+              </a>{' '}
+              /
+            </div>
+            <a
+              href={repository.url}
+              className="block font-sans text-lg font-medium hover:underline"
+            >
+              {name}
+            </a>
+          </div>
           {repository.homepageUrl ? (
-            <a href={repository.homepageUrl} className="flex text-gray-800">
+            <a
+              href={repository.homepageUrl}
+              className="flex text-gray-500 hover:text-black"
+            >
               <span className="pr-1">
                 <Icon fontSize="200" top="7px" icon="solid-globe-asia">
                   {repository.homepageUrl}
