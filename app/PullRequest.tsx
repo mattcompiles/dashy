@@ -173,7 +173,6 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
             </div>
           ) : null}
         </div>
-        {canMerge ? <Button size="small">Merge</Button> : null}
       </div>
       <div className="w-10">
         {checks ? (
