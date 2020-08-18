@@ -155,13 +155,25 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
             </div>
           ) : null}
           {isDraft ? <span>Draft</span> : null}
+          {!mergeable ? <span>Needs Update</span> : null}
+          {reviewDecision === 'APPROVED' ? (
+            <div
+              style={{ bottom: 4 }}
+              className="relative bg-green-500 p-1 rounded font-bold text-white"
+            >
+              Approved
+            </div>
+          ) : null}
+          {reviewDecision === 'CHANGES_REQUESTED' ? (
+            <div
+              style={{ bottom: 4 }}
+              className="relative bg-red-500 p-1 rounded font-bold text-white"
+            >
+              Rejected
+            </div>
+          ) : null}
         </div>
         {canMerge ? <Button size="small">Merge</Button> : null}
-        {!mergeable ? (
-          <Button size="small" onClick={updatePR}>
-            Update
-          </Button>
-        ) : null}
       </div>
       <div className="w-10">
         {checks ? (
@@ -214,30 +226,6 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
             })}
           />
         ) : null}
-
-        {/* <StatusIndicator
-          checks={[
-            (() => {
-              switch (reviewDecision) {
-                case 'APPROVED': {
-                  return 'SUCCESS';
-                }
-
-                case 'REVIEW_REQUIRED': {
-                  return 'CAUTION';
-                }
-
-                case 'CHANGES_REQUESTED': {
-                  return 'CRITICAL';
-                }
-
-                default: {
-                  return 'UNKNOWN';
-                }
-              }
-            })(),
-          ]}
-        /> */}
       </div>
     </div>
   );

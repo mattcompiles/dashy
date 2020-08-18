@@ -90,7 +90,7 @@ export function Repo({ owner, name }: RepoProps) {
   return (
     <div>
       <div className="flex pb-2 px-1 justify-between text-gray-500 hover:text-black transition duration-300 ease-in-out">
-        <span>Repo</span>
+        <span className="text-sm">Repo</span>
         <Icon top="4px" fontSize="200" icon="solid-cog" />
       </div>
       <div className="rounded-md shadow bg-white p-4 space-y-2 divide-y-2">
