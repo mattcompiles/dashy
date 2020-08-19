@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Icon } from 'bumbag';
+import { Icon, Popover } from 'bumbag';
 import { formatDistanceToNow } from 'date-fns';
 import { useFragment, graphql } from 'relay-hooks';
 import { useRecoilValue } from 'recoil';
@@ -7,7 +7,7 @@ import { useRecoilValue } from 'recoil';
 import { PullRequest_pr$key } from './__generated__/PullRequest_pr.graphql';
 import { tokenState } from './state';
 import { StatusIndicator } from './StatusIndicator';
-import { Badge, Link, Divider } from './System';
+import { Badge, Link, Divider, Text } from './System';
 
 const pullRequestFragment = graphql`
   fragment PullRequest_pr on PullRequest {
@@ -143,54 +143,78 @@ export function PullRequest({
         </div>
         <div className="flex-shrink-0 flex-grow-0 w-10">
           {checks ? (
-            <StatusIndicator
-              checks={checks.map((check) => {
-                if (check?.__typename === 'StatusContext') {
-                  switch (check.state) {
-                    case 'ERROR':
-                    case 'FAILURE': {
-                      return 'CRITICAL';
+            <Popover.State>
+              <Popover.Disclosure>
+                <StatusIndicator
+                  checks={checks.map((check) => {
+                    if (check?.__typename === 'StatusContext') {
+                      switch (check.state) {
+                        case 'ERROR':
+                        case 'FAILURE': {
+                          return 'CRITICAL';
+                        }
+
+                        case 'PENDING': {
+                          return 'CAUTION';
+                        }
+
+                        case 'SUCCESS': {
+                          return 'SUCCESS';
+                        }
+
+                        default: {
+                          return 'UNKNOWN';
+                        }
+                      }
                     }
 
-                    case 'PENDING': {
-                      return 'CAUTION';
+                    if (check?.__typename === 'CheckRun') {
+                      if (check.status !== 'COMPLETED') {
+                        return 'CAUTION';
+                      }
+
+                      switch (check.conclusion) {
+                        case 'SUCCESS': {
+                          return 'SUCCESS';
+                        }
+
+                        case 'CANCELLED':
+                        case 'FAILURE':
+                        case 'TIMED_OUT': {
+                          return 'CRITICAL';
+                        }
+
+                        default: {
+                          return 'UNKNOWN';
+                        }
+                      }
                     }
 
-                    case 'SUCCESS': {
-                      return 'SUCCESS';
+                    return 'UNKNOWN';
+                  })}
+                />
+              </Popover.Disclosure>
+              <Popover hasArrow>
+                <div className="space-y-1">
+                  {checks.map((check) => {
+                    if (check?.__typename === 'StatusContext') {
+                      return (
+                        <div className="flex">
+                          <img
+                            src={check.avatarUrl ?? ''}
+                            className="flex-shrink-0"
+                          />
+                          <Link href={check.targetUrl ?? ''} hoverUnderline>
+                            {check.description}
+                          </Link>
+                          <Text>{check.state}</Text>
+                        </div>
+                      );
                     }
-
-                    default: {
-                      return 'UNKNOWN';
-                    }
-                  }
-                }
-
-                if (check?.__typename === 'CheckRun') {
-                  if (check.status !== 'COMPLETED') {
-                    return 'CAUTION';
-                  }
-
-                  switch (check.conclusion) {
-                    case 'SUCCESS': {
-                      return 'SUCCESS';
-                    }
-
-                    case 'CANCELLED':
-                    case 'FAILURE':
-                    case 'TIMED_OUT': {
-                      return 'CRITICAL';
-                    }
-
-                    default: {
-                      return 'UNKNOWN';
-                    }
-                  }
-                }
-
-                return 'UNKNOWN';
-              })}
-            />
+                  })}
+                </div>
+              </Popover>
+            </Popover.State>
           ) : null}
         </div>
       </div>
