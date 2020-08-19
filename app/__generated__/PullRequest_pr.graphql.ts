@@ -36,6 +36,7 @@ export type PullRequest_pr = {
                             readonly state: StatusState;
                             readonly targetUrl: string | null;
                             readonly description: string | null;
+                            readonly context: string;
                         } | {
                             readonly __typename: "CheckRun";
                             readonly name: string;
@@ -273,6 +274,13 @@ return {
                                   "kind": "ScalarField",
                                   "name": "description",
                                   "storageKey": null
+                                },
+                                {
+                                  "alias": null,
+                                  "args": null,
+                                  "kind": "ScalarField",
+                                  "name": "context",
+                                  "storageKey": null
                                 }
                               ],
                               "type": "StatusContext",
@@ -380,5 +388,5 @@ return {
   "abstractKey": null
 };
 })();
-(node as any).hash = 'f6c1c59f57d8a58de0572a15800b4298';
+(node as any).hash = '5371f8a281858ea80f901f2e06843172';
 export default node;

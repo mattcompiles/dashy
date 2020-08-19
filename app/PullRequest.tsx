@@ -38,6 +38,7 @@ const pullRequestFragment = graphql`
                   state
                   targetUrl
                   description
+                  context
                 }
                 ... on CheckRun {
                   name
@@ -199,15 +200,34 @@ export function PullRequest({
                   {checks.map((check) => {
                     if (check?.__typename === 'StatusContext') {
                       return (
-                        <div className="flex">
+                        <div className="py-1 flex items-center">
                           <img
                             src={check.avatarUrl ?? ''}
-                            className="flex-shrink-0"
+                            className="w-8 h-8 flex-shrink-0"
                           />
-                          <Link href={check.targetUrl ?? ''} hoverUnderline>
-                            {check.description}
-                          </Link>
+                          <div className="px-1 flex-grow">
+                            <Link href={check.targetUrl ?? ''} hoverUnderline>
+                              {check.context}
+                            </Link>
+                          </div>
                           <Text>{check.state}</Text>
+                        </div>
+                      );
+                    }
+
+                    if (check?.__typename === 'CheckRun') {
+                      return (
+                        <div className="py-1 flex items-center">
+                          <img
+                            src="https://avatars0.githubusercontent.com/in/15368?s=40&v=4"
+                            className="w-8 h-8 flex-shrink-0"
+                          />
+                          <div className="px-1 flex-grow">
+                            <Link href={check.detailsUrl ?? ''} hoverUnderline>
+                              {check.name}
+                            </Link>
+                          </div>
+                          <Text>{check.conclusion}</Text>
                         </div>
                       );
                     }

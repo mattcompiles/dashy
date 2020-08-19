@@ -98,6 +98,7 @@ fragment PullRequest_pr on PullRequest {
                 state
                 targetUrl
                 description
+                context
               }
               ... on CheckRun {
                 name
@@ -566,7 +567,14 @@ return {
                                                 "name": "targetUrl",
                                                 "storageKey": null
                                               },
-                                              (v7/*: any*/)
+                                              (v7/*: any*/),
+                                              {
+                                                "alias": null,
+                                                "args": null,
+                                                "kind": "ScalarField",
+                                                "name": "context",
+                                                "storageKey": null
+                                              }
                                             ],
                                             "type": "StatusContext",
                                             "abstractKey": null
@@ -688,12 +696,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d9f4e78f1a58d01915d7b26882d327e1",
+    "cacheID": "7a718692af05b7681d9c3d7d4d329504",
     "id": null,
     "metadata": {},
     "name": "RepoQuery",
     "operationKind": "query",
-    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  isDraft\n  author {\n    __typename\n    avatarUrl\n    login\n    ... on Node {\n      __isNode: __typename\n      id\n    }\n  }\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 100) {\n            totalCount\n            nodes {\n              __typename\n              ... on StatusContext {\n                avatarUrl\n                state\n                targetUrl\n                description\n              }\n              ... on CheckRun {\n                name\n                status\n                conclusion\n                detailsUrl\n              }\n              ... on Node {\n                __isNode: __typename\n                id\n              }\n            }\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
+    "text": "query RepoQuery(\n  $name: String!\n  $owner: String!\n  $prCount: Int!\n) {\n  repository(name: $name, owner: $owner) {\n    url\n    homepageUrl\n    releases(last: 1) {\n      nodes {\n        publishedAt\n        description\n        url\n        tagName\n        id\n      }\n    }\n    pullRequests(states: OPEN, first: $prCount, orderBy: {field: UPDATED_AT, direction: DESC}) {\n      totalCount\n      nodes {\n        ...PullRequest_pr\n        id\n      }\n    }\n    id\n  }\n}\n\nfragment PullRequest_pr on PullRequest {\n  number\n  title\n  mergeable\n  viewerDidAuthor\n  reviewDecision\n  url\n  isDraft\n  author {\n    __typename\n    avatarUrl\n    login\n    ... on Node {\n      __isNode: __typename\n      id\n    }\n  }\n  commits(last: 1) {\n    nodes {\n      commit {\n        pushedDate\n        oid\n        statusCheckRollup {\n          state\n          contexts(first: 100) {\n            totalCount\n            nodes {\n              __typename\n              ... on StatusContext {\n                avatarUrl\n                state\n                targetUrl\n                description\n                context\n              }\n              ... on CheckRun {\n                name\n                status\n                conclusion\n                detailsUrl\n              }\n              ... on Node {\n                __isNode: __typename\n                id\n              }\n            }\n          }\n          id\n        }\n        id\n      }\n      id\n    }\n  }\n  timelineItems(itemTypes: [ISSUE_COMMENT, PULL_REQUEST_REVIEW], last: 1) {\n    nodes {\n      __typename\n      ... on IssueComment {\n        updatedAt\n      }\n      ... on PullRequestReview {\n        updatedAt\n      }\n      ... on Node {\n        __isNode: __typename\n        id\n      }\n    }\n  }\n}\n"
   }
 };
 })();
