@@ -194,7 +194,7 @@ export function PullRequest({
           ) : null}
         </div>
       </div>
-      {!last ? <Divider space={2} /> : null}
+      {!last ? <Divider space={4} /> : null}
     </Fragment>
   );
 }

@@ -101,7 +101,7 @@ export function Repo({ owner, name }: RepoProps) {
         ) : null}
       </div>
 
-      <Divider />
+      <Divider space={2} size={2} />
 
       <div className="pt-2">
         {repository.pullRequests.totalCount === 0 ? (
@@ -122,7 +122,7 @@ export function Repo({ owner, name }: RepoProps) {
             .filter(Boolean)
         )}
         {totalPRs > PR_COUNT ? (
-          <div className="pt-1">
+          <div className="pt-2">
             <Text color="gray-700">+ {totalPRs - PR_COUNT} more</Text>
           </div>
         ) : null}

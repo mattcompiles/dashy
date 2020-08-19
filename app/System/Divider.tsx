@@ -10,7 +10,7 @@ export function Divider({ size, space, color }: DividerProps) {
   return (
     <div
       className={clsx(
-        `border-t-${color}`,
+        color ? `border-t-${color}` : '',
         `border-t${size ? `-${size}` : ''}`,
         space ? `pb-${space}` : '',
         space ? `mt-${space}` : '',
