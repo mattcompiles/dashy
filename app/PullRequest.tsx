@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
-import clsx from 'clsx';
-import { Columns, Tag, Button, Link, Stack, Set, Text, Icon } from 'bumbag';
+import { Icon } from 'bumbag';
 import { formatDistanceToNow } from 'date-fns';
 import { useFragment, graphql } from 'relay-hooks';
 import { useRecoilValue } from 'recoil';
@@ -8,7 +7,7 @@ import { useRecoilValue } from 'recoil';
 import { PullRequest_pr$key } from './__generated__/PullRequest_pr.graphql';
 import { tokenState } from './state';
 import { StatusIndicator } from './StatusIndicator';
-import { Switch } from 'bumbag/ts/Switch/styles';
+import { Badge, Link, Divider } from './System';
 
 const pullRequestFragment = graphql`
   fragment PullRequest_pr on PullRequest {
@@ -69,8 +68,14 @@ interface PullRequestProps {
   pr: PullRequest_pr$key;
   repoName: string;
   repoOwner: string;
+  last: boolean;
 }
-export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
+export function PullRequest({
+  repoName,
+  repoOwner,
+  pr,
+  last,
+}: PullRequestProps) {
   const {
     number,
     title,
@@ -80,7 +85,6 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
     commits,
     timelineItems,
     isDraft,
-    author,
   } = useFragment(pullRequestFragment, pr);
   const token = useRecoilValue(tokenState);
 
@@ -96,136 +100,101 @@ export function PullRequest({ repoName, repoOwner, pr }: PullRequestProps) {
     ? commits.nodes[0]?.commit.statusCheckRollup?.state
     : undefined;
 
-  const numChecks = commits.nodes
-    ? commits.nodes[0]?.commit.statusCheckRollup?.contexts.totalCount
-    : null;
-
   const checks = commits.nodes
     ? commits.nodes[0]?.commit.statusCheckRollup?.contexts.nodes
     : null;
 
-  const canMerge =
-    mergeable && reviewDecision === 'APPROVED' && status === 'SUCCESS';
-
-  const updatePR = () => {
-    fetch(
-      `https://api.github.com/repos/${repoOwner}/${repoName}/pulls/${number}/update-branch`,
-      {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/vnd.github.lydian-preview+json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          expected_head_sha: latestCommit?.oid,
-        }),
-      },
-    )
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  };
-
   return (
-    <div className="flex space-x-3 pt-4">
-      {/* {author ? (
+    <Fragment>
+      <div className="flex space-x-3">
+        {/* {author ? (
         <img src={author.avatarUrl} className="h-8 mr-2 rounded-full" />
       ) : null} */}
-      <div className="flex flex-col space-y-2 flex-grow">
-        <a
-          href={url}
-          className="font-sans text-gray-700 font-medium hover:underline"
-        >
-          {title}
-        </a>
-        <div className="flex space-x-2 font-sans text-xs text-gray-700">
-          {lastCodeUpdate ? (
-            <div className="flex space-x-2">
-              <Icon top="3px" icon="solid-code" />
-              <span>{formatDistanceToNow(new Date(lastCodeUpdate))}</span>
-            </div>
-          ) : null}
-          {lastActivity ? (
-            <div className="flex space-x-2">
-              <Icon top="3px" icon="solid-comment" />
-              <span>{formatDistanceToNow(new Date(lastActivity))}</span>
-            </div>
-          ) : null}
-          {isDraft ? <span>Draft</span> : null}
-          {!mergeable ? <span>Needs Update</span> : null}
-          {reviewDecision === 'APPROVED' ? (
-            <div
-              style={{ bottom: 4 }}
-              className="relative bg-green-500 p-1 rounded font-bold text-white"
-            >
-              Approved
-            </div>
-          ) : null}
-          {reviewDecision === 'CHANGES_REQUESTED' ? (
-            <div
-              style={{ bottom: 4 }}
-              className="relative bg-red-500 p-1 rounded font-bold text-white"
-            >
-              Rejected
-            </div>
-          ) : null}
+        <div className="flex flex-col space-y-2 flex-grow">
+          <Link href={url} color="gray-700" weight="medium" hoverUnderline>
+            {title}
+          </Link>
+          <div className="flex space-x-2 font-sans text-xs text-gray-700">
+            {lastCodeUpdate ? (
+              <div className="flex space-x-2">
+                <Icon top="3px" icon="solid-code" />
+                <span>{formatDistanceToNow(new Date(lastCodeUpdate))}</span>
+              </div>
+            ) : null}
+            {lastActivity ? (
+              <div className="flex space-x-2">
+                <Icon top="3px" icon="solid-comment" />
+                <span>{formatDistanceToNow(new Date(lastActivity))}</span>
+              </div>
+            ) : null}
+            {isDraft ? <span>Draft</span> : null}
+            {!mergeable ? <span>Needs Update</span> : null}
+            {reviewDecision === 'APPROVED' ? (
+              <Badge tone="positive" nudge={4}>
+                Approved
+              </Badge>
+            ) : null}
+            {reviewDecision === 'CHANGES_REQUESTED' ? (
+              <Badge tone="critical" nudge={4}>
+                Rejected
+              </Badge>
+            ) : null}
+          </div>
         </div>
-      </div>
-      <div className="w-10">
-        {checks ? (
-          <StatusIndicator
-            checks={checks.map((check) => {
-              if (check?.__typename === 'StatusContext') {
-                switch (check.state) {
-                  case 'ERROR':
-                  case 'FAILURE': {
-                    return 'CRITICAL';
-                  }
+        <div className="flex-shrink-0 flex-grow-0 w-10">
+          {checks ? (
+            <StatusIndicator
+              checks={checks.map((check) => {
+                if (check?.__typename === 'StatusContext') {
+                  switch (check.state) {
+                    case 'ERROR':
+                    case 'FAILURE': {
+                      return 'CRITICAL';
+                    }
 
-                  case 'PENDING': {
+                    case 'PENDING': {
+                      return 'CAUTION';
+                    }
+
+                    case 'SUCCESS': {
+                      return 'SUCCESS';
+                    }
+
+                    default: {
+                      return 'UNKNOWN';
+                    }
+                  }
+                }
+
+                if (check?.__typename === 'CheckRun') {
+                  if (check.status !== 'COMPLETED') {
                     return 'CAUTION';
                   }
 
-                  case 'SUCCESS': {
-                    return 'SUCCESS';
-                  }
+                  switch (check.conclusion) {
+                    case 'SUCCESS': {
+                      return 'SUCCESS';
+                    }
 
-                  default: {
-                    return 'UNKNOWN';
-                  }
-                }
-              }
+                    case 'CANCELLED':
+                    case 'FAILURE':
+                    case 'TIMED_OUT': {
+                      return 'CRITICAL';
+                    }
 
-              if (check?.__typename === 'CheckRun') {
-                if (check.status !== 'COMPLETED') {
-                  return 'CAUTION';
-                }
-
-                switch (check.conclusion) {
-                  case 'SUCCESS': {
-                    return 'SUCCESS';
-                  }
-
-                  case 'CANCELLED':
-                  case 'FAILURE':
-                  case 'TIMED_OUT': {
-                    return 'CRITICAL';
-                  }
-
-                  default: {
-                    return 'UNKNOWN';
+                    default: {
+                      return 'UNKNOWN';
+                    }
                   }
                 }
-              }
 
-              return 'UNKNOWN';
-            })}
-          />
-        ) : null}
+                return 'UNKNOWN';
+              })}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+      {!last ? <Divider space={2} /> : null}
+    </Fragment>
   );
 }

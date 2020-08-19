@@ -12,9 +12,7 @@ export function Item({ type, children }: ItemProps) {
         <span className="text-sm">{type}</span>
         <Icon top="4px" fontSize="200" icon="solid-cog" />
       </div>
-      <div className="rounded-md shadow bg-white p-4 space-y-2 divide-y-2">
-        {children}
-      </div>
+      <div className="rounded-md shadow bg-white p-4">{children}</div>
     </div>
   );
 }

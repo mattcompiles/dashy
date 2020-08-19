@@ -1,12 +1,12 @@
 import React, { ReactNode } from 'react';
 import { graphql, useQuery } from 'relay-hooks';
-import { Text, Icon } from 'bumbag';
+import { Icon } from 'bumbag';
 import { useRecoilValue } from 'recoil';
 
 import { PullRequest } from './PullRequest';
 import { RepoQuery } from './__generated__/RepoQuery.graphql';
 import { lastFetchState } from './state';
-import { Item } from './System/Item';
+import { Item, Link, Text, Divider } from './System';
 
 const PR_COUNT = 3;
 
@@ -69,20 +69,23 @@ export function Repo({ owner, name }: RepoProps) {
 
   return (
     <Item type="Repo">
-      <div className="flex justify-between">
-        <div>
-          <div className="block font-sans font-medium text-sm text-gray-500">
-            <a href={`https://github.com/${owner}`} className="hover:underline">
+      <div className="flex justify-between pb-1">
+        <div className="flex flex-col">
+          <Text size="sm" weight="medium" color="gray-500">
+            <Link
+              href={`https://github.com/${owner}`}
+              size="sm"
+              weight="medium"
+              color="gray-500"
+              hoverUnderline
+            >
               {owner}
-            </a>{' '}
+            </Link>{' '}
             /
-          </div>
-          <a
-            href={repository.url}
-            className="block font-sans text-lg font-medium hover:underline"
-          >
+          </Text>
+          <Link href={repository.url} size="lg" weight="medium" hoverUnderline>
             {name}
-          </a>
+          </Link>
         </div>
         {repository.homepageUrl ? (
           <a
@@ -98,26 +101,31 @@ export function Repo({ owner, name }: RepoProps) {
         ) : null}
       </div>
 
-      <div>
-        <div className="pb-4 space-y-4 divide-y">
-          {repository.pullRequests.totalCount === 0 ? (
-            <Text>No open pull requests</Text>
-          ) : (
-            pullRequests
-              .map((node, index) => {
-                return node ? (
-                  <PullRequest
-                    key={index}
-                    pr={node}
-                    repoName={name}
-                    repoOwner={owner}
-                  />
-                ) : null;
-              })
-              .filter(Boolean)
-          )}
-          {totalPRs > PR_COUNT ? <Text>{totalPRs - PR_COUNT} more</Text> : null}
-        </div>
+      <Divider />
+
+      <div className="pt-2">
+        {repository.pullRequests.totalCount === 0 ? (
+          <Text>No open pull requests</Text>
+        ) : (
+          pullRequests
+            .map((node, index) => {
+              return node ? (
+                <PullRequest
+                  key={index}
+                  pr={node}
+                  repoName={name}
+                  repoOwner={owner}
+                  last={index === pullRequests.length - 1}
+                />
+              ) : null;
+            })
+            .filter(Boolean)
+        )}
+        {totalPRs > PR_COUNT ? (
+          <div className="pt-1">
+            <Text color="gray-700">+ {totalPRs - PR_COUNT} more</Text>
+          </div>
+        ) : null}
       </div>
     </Item>
   );

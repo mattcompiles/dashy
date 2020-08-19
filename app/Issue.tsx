@@ -1,25 +1,13 @@
 import React, { Fragment } from 'react';
 import { graphql, useQuery } from 'relay-hooks';
-import {
-  Divider,
-  Card,
-  Stack,
-  Text,
-  Link,
-  Set,
-  Box,
-  Columns,
-  Avatar,
-} from 'bumbag';
+import { Divider, Stack, Text, Box, Columns, Avatar } from 'bumbag';
 import { useRecoilValue } from 'recoil';
 import pluralize from 'pluralize';
 import { format } from 'date-fns';
 
 import { lastFetchState } from './state';
 import { IssueQuery } from './__generated__/IssueQuery.graphql';
-import { Item } from './System/Item';
-import { Badge } from './System/Badge';
-import clsx from 'clsx';
+import { Badge, Item } from './System';
 
 const GET_ISSUE = graphql`
   query IssueQuery($repoName: String!, $repoOwner: String!, $issue: Int!) {
