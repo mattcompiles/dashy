@@ -40,14 +40,15 @@ export function StatusIndicator({ checks }: StatusIndicatorProps) {
         ></circle>
         {checks.map((status, index) => (
           <circle
+            key={index}
             cx={size / 2}
             cy={size / 2}
             r="15.91549430918954"
             fill="transparent"
             stroke={statusToColor(status)}
-            stroke-width="5"
-            stroke-dasharray={`${percent} ${100 - percent}`}
-            stroke-dashoffset={(percent + gap) * index + 25 - gap / 2}
+            strokeWidth="5"
+            strokeDasharray={`${percent} ${100 - percent}`}
+            strokeDashoffset={(percent + gap) * index + 25 - gap / 2}
           />
         ))}
       </svg>

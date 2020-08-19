@@ -8,7 +8,6 @@ import {
   Link,
   Set,
   Box,
-  Badge,
   Columns,
   Avatar,
 } from 'bumbag';
@@ -18,6 +17,9 @@ import { format } from 'date-fns';
 
 import { lastFetchState } from './state';
 import { IssueQuery } from './__generated__/IssueQuery.graphql';
+import { Item } from './System/Item';
+import { Badge } from './System/Badge';
+import clsx from 'clsx';
 
 const GET_ISSUE = graphql`
   query IssueQuery($repoName: String!, $repoOwner: String!, $issue: Int!) {
@@ -69,22 +71,43 @@ export function Issue({ repoOwner, repoName, issue }: RepoProps) {
   const lastComment = comments.nodes ? comments.nodes[0] : null;
 
   return (
-    <Card footer={<Text use="sub">{}</Text>}>
-      <Stack spacing="major-1">
-        <Set>
-          <Badge size="medium" palette={closed ? 'danger' : 'success'}>
-            {closed ? 'Closed' : 'Open'}
-          </Badge>
-          <Link href={url}>{title}</Link>
-        </Set>
-        <Box>
-          <Link href={`https://github.com/${repoOwner}/${repoName}`}>
-            {repoOwner}/{repoName}
-          </Link>
-        </Box>
-        <Text>
+    <Item type="Issue">
+      <div className="space-y-2">
+        <div className="flex justify-between">
+          <div>
+            <div className="block font-sans font-medium text-sm text-gray-500">
+              <a
+                href={`https://github.com/${repoOwner}`}
+                className="hover:underline"
+              >
+                {repoOwner}
+              </a>{' '}
+              /{' '}
+              <a
+                href={`https://github.com/${repoOwner}/${repoName}`}
+                className="hover:underline"
+              >
+                {repoName}
+              </a>
+            </div>
+            <a
+              href={url}
+              className="block font-sans text-lg font-medium hover:underline"
+            >
+              {title}
+            </a>
+          </div>
+
+          <div className="inline">
+            <Badge tone={closed ? 'critical' : 'positive'}>
+              {closed ? 'Closed' : 'Open'}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="text-sans text-gray-700 text-sm">
           {comments.totalCount} {pluralize('comments', comments.totalCount)}
-        </Text>
+        </div>
         <Divider />
         {lastComment ? (
           <Fragment>
@@ -115,7 +138,7 @@ export function Issue({ repoOwner, repoName, issue }: RepoProps) {
             </Columns>
           </Fragment>
         ) : null}
-      </Stack>
-    </Card>
+      </div>
+    </Item>
   );
 }
