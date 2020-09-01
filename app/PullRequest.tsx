@@ -131,12 +131,12 @@ export function PullRequest({
             {isDraft ? <span>Draft</span> : null}
             {!mergeable ? <span>Needs Update</span> : null}
             {reviewDecision === 'APPROVED' ? (
-              <Badge tone="positive" nudge={4}>
+              <Badge tone="positive" nudge={-3}>
                 Approved
               </Badge>
             ) : null}
             {reviewDecision === 'CHANGES_REQUESTED' ? (
-              <Badge tone="critical" nudge={4}>
+              <Badge tone="critical" nudge={-3}>
                 Rejected
               </Badge>
             ) : null}

@@ -122,9 +122,12 @@ export function Repo({ owner, name }: RepoProps) {
             .filter(Boolean)
         )}
         {totalPRs > PR_COUNT ? (
-          <div className="pt-2">
+          <a
+            href={`https://github.com/${owner}/${name}/pulls`}
+            className="pt-2"
+          >
             <Text color="gray-700">+ {totalPRs - PR_COUNT} more</Text>
-          </div>
+          </a>
         ) : null}
       </div>
     </Item>
